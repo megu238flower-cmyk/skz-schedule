@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>SKZ SCHEDULE</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:     #09090d;
+      --bg2:    #111118;
+      --bg3:    #1a1a24;
+      --accent: #ffd600;
+      --actext: #000000;
+      --text:   #ededf5;
+      --text2:  #50506a;
+      --border: #1e1e2e;
+      --sun:    #ff5252;
+      --sat:    #4d8cff;
+      --pat:    rgba(255,214,0,0.018);
+      --wm:     rgba(255,214,0,0.028);
+      --r: 8px;
+    }
+
+    html { height: 100%; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+      min-height: 100%;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image:
+        repeating-linear-gradient(-45deg, transparent 0, transparent 28px, var(--pat) 28px, var(--pat) 29px),
+        repeating-linear-gradient( 45deg, transparent 0, transparent 28px, var(--pat) 28px, var(--pat) 29px);
+      transition: background-image 0.3s;
+    }
+
+    /* ═══════════════════════ HEADER ═══════════════════════ */
+    .header {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--bg2);
+      padding: 9px 12px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .header::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0; height: 1.5px;
+      background: linear-gradient(90deg, var(--accent), transparent 70%);
+    }
+
+    .logo { flex-shrink: 0; line-height: 1; }
+    .logo-main { font-size: 20px; font-weight: 900; letter-spacing: 5px; color: var(--accent); }
+    .logo-sub  { font-size: 8px; letter-spacing: 3px; color: var(--text2); margin-top: 1px; }
+
+    .nav-group { display: flex; align-items: center; gap: 8px; }
+
+    .nav-btn {
+      background: none; border: 1px solid var(--border);
+      color: var(--text); width: 34px; height: 34px; border-radius: var(--r);
+      font-size: 20px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .nav-btn:active { border-color: var(--accent); color: var(--accent); }
+
+    .month-disp { font-size: 16px; font-weight: 700; min-width: 120px; text-align: center; }
+
+    .header-right { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+
+    .today-btn {
+      background: none; border: 1px solid var(--border); color: var(--text2);
+      font-size: 11px; font-weight: 700; letter-spacing: 1px;
+      padding: 6px 10px; border-radius: var(--r); cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .today-btn:active { border-color: var(--accent); color: var(--accent); }
+
+    /* Theme button: colored circle */
+    .theme-btn {
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 2px solid var(--border);
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+      transition: border-color 0.2s; flex-shrink: 0;
+    }
+    .theme-btn:active { border-color: var(--accent); }
+
+    .mgr-btn {
+      background: var(--accent); color: var(--actext); border: none;
+      font-size: 11px; font-weight: 800; letter-spacing: 1px;
+      padding: 7px 12px; border-radius: var(--r); cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      white-space: nowrap;
+    }
+
+    /* ═══════════════════════ THEME PICKER ═══════════════════════ */
+    .theme-picker {
+      position: fixed; z-index: 300;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 14px; padding: 14px;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+      top: 60px; right: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .theme-picker.hide { display: none; }
+
+    .theme-swatch {
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+    }
+    .swatch-circle {
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 3px solid transparent;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+    .swatch-circle:active { transform: scale(0.9); }
+    .swatch-circle.active { border-color: var(--accent); }
+    .swatch-name { font-size: 10px; color: var(--text2); text-align: center; }
+
+    /* ═══════════════════════ WEEKDAYS ═══════════════════════ */
+    .weekdays {
+      position: sticky; top: 55px; z-index: 99;
+      display: grid; grid-template-columns: repeat(7, 1fr);
+      background: var(--bg2); border-bottom: 1px solid var(--border);
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .wd {
+      text-align: center; font-size: 11px; font-weight: 700;
+      letter-spacing: 1px; padding: 6px 0; color: var(--text2);
+    }
+    .wd.sun { color: var(--sun); }
+    .wd.sat { color: var(--sat); }
+
+    /* ═══════════════════════ CALENDAR ═══════════════════════ */
+    .cal-area { padding: 4px 4px 0; position: relative; z-index: 1; }
+
+    /* SKZ watermark */
+    .cal-area::before {
+      content: 'SKZ';
+      position: fixed; top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      font-size: clamp(100px, 20vw, 200px);
+      font-weight: 900; letter-spacing: 16px;
+      color: var(--wm);
+      pointer-events: none; z-index: 0; user-select: none;
+      transition: color 0.3s;
+    }
+
+    .cal-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr);
+      gap: 3px; position: relative; z-index: 1;
+    }
+
+    .day {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--r); min-height: 72px; padding: 3px;
+      cursor: pointer; overflow: hidden;
+      display: flex; flex-direction: column;
+      -webkit-tap-highlight-color: transparent;
+      transition: border-color 0.12s, background 0.3s;
+      position: relative;
+    }
+    .day:active { border-color: var(--accent); }
+    .day.other  { opacity: 0.2; pointer-events: none; }
+    .day.has-data { border-color: rgba(128,128,128,0.3); }
+    .day.selected { border-color: var(--accent); border-width: 2px; }
+    .day.today .day-num { background: var(--accent); color: var(--actext); border-radius: 50%; }
+
+    .day-num {
+      font-size: 12px; font-weight: 700;
+      width: 22px; height: 22px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .day-num.s  { color: var(--sun); }
+    .day-num.sa { color: var(--sat); }
+
+    /* Sunday = last column, Saturday = 6th column in Mon-start */
+    .day-num.mon-sat { color: var(--sat); }
+    .day-num.mon-sun { color: var(---un); }
+
+    .stamp-row {
+      display: flex; flex-wrap: wrap; gap: 2px; margin-top: 2px;
+    }
+    .s-mini {
+      width: 20px; height: 20px; border-radius: 3px; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; background: var(--bg3); flex-shrink: 0;
+    }
+    .s-mini img { width: 100%; height: 100%; object-fit: cover; }
+    .s-more {
+      width: 20px; height: 20px; border-radius: 3px; background: var(--bg3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 8px; color: var(--text2);
+    }
+
+    .day-time-preview {
+      font-size: 8px; color: var(--accent); margin-top: 1px; font-weight: 600;
+    }
+    .day-note-preview {
+      font-size: 8px; color: var(--text2); margin-top: 1px;
+      overflow: hidden; line-height: 1.3;
+    }
+
+    /* Camera icon badge */
+    .img-badge {
+      position: absolute; top: 2px; right: 2px;
+      font-size: 10px; opacity: 0.7;
+    }
+
+    /* ═══════════════════════ DETAIL PANEL ═══════════════════════ */
+    .detail-panel {
+      margin: 4px 4px 0; padding: 14px 14px 100px;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--r);
+      min-height: 180px;
+      transition: background 0.3s, border-color 0.3s;
+      position: relative; z-index: 1;
+    }
+
+    .detail-empty {
+      color: var(--text2); font-size: 13px; text-align: center;
+      padding: 40px 0; letter-spacing: 1px;
+    }
+
+    .detail-top {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border);
+    }
+    .detail-date-str { font-size: 17px; font-weight: 800; color: var(--accent); }
+    .detail-edit-btn {
+      background: var(--accent); color: var(--actext); border: none;
+      font-size: 12px; font-weight: 800; letter-spacing: 1px;
+      padding: 7px 16px; border-radius: var(--r); cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .detail-section { margin-bottom: 12px; }
+    .detail-lbl {
+      font-size: 9px; font-weight: 700; letter-spacing: 2px;
+      color: var(--text2); margin-bottom: 6px;
+    }
+
+    .detail-stamps-row {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;
+    }
+    .detail-stamp {
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+    }
+    .detail-stamp-thumb {
+      width: 36px; height: 36px; border-radius: 6px; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; background: var(--bg3);
+    }
+    .detail-stamp-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .detail-stamp-name { font-size: 8px; color: var(--text2); text-align: center; }
+
+    .detail-time {
+      font-size: 16px; font-weight: 700; color: var(--text);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .detail-time-icon { font-size: 14px; }
+
+    .detail-note-text {
+      font-size: 14px; line-height: 1.7; color: var(--text);
+      white-space: pre-wrap; word-break: break-word;
+    }
+
+    .detail-img-btn {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 10px 14px; cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: border-color 0.15s;
+    }
+    .detail-img-btn:active { border-color: var(--accent); }
+    .detail-img-preview {
+      width: 40px; height: 40px; border-radius: 4px; overflow: hidden; flex-shrink: 0;
+    }
+    .detail-img-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .detail-img-label { font-size: 13px; color: var(--text); }
+    .detail-img-sub   { font-size: 10px; color: var(--text2); }
+
+    /* ═══════════════════════ PALETTE ═══════════════════════ */
+    .palette {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+      background: var(--bg2); border-top: 1px solid var(--border);
+      padding: 6px 8px;
+      display: flex; align-items: center; gap: 6px;
+      transition: background 0.3s, border-color 0.3s;
+    }
+
+    .text-mode-btn {
+      flex-shrink: 0; width: 50px; height: 50px;
+      border-radius: var(--r); border: 2px solid var(--border);
+      background: var(--bg3); cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-size: 18px; color: var(--text2); gap: 2px;
+      -webkit-tap-highlight-color: transparent;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .text-mode-btn.active {
+      border-color: var(--accent); color: var(--accent);
+      background: rgba(128,128,0,0.08);
+    }
+    .btn-label { font-size: 8px; font-weight: 700; letter-spacing: 0.5px; }
+
+    .pal-sep { width: 1px; height: 36px; background: var(--border); flex-shrink: 0; }
+
+    .pal-stamps {
+      display: flex; gap: 5px; overflow-x: auto; flex: 1;
+      -webkit-overflow-scrolling: touch;
+    }
+    .pal-stamps::-webkit-scrollbar { display: none; }
+
+    .p-stamp {
+      flex-shrink: 0; width: 50px; height: 50px;
+      border-radius: var(--r); border: 2px solid var(--border);
+      background: var(--bg3); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; overflow: hidden; position: relative;
+      -webkit-tap-highlight-color: transparent;
+      transition: border-color 0.15s;
+    }
+    .p-stamp.sel {
+      border-color: var(--accent);
+      box-shadow: 0 0 10px rgba(128,100,0,0.3);
+    }
+    .p-stamp img { width: 100%; height: 100%; object-fit: cover; }
+    .p-lbl {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: rgba(0,0,0,0.72); font-size: 7px; text-align: center;
+      padding: 1px 2px; color: #fff; line-height: 1.4;
+    }
+
+    .hint-bar {
+      font-size: 10px; color: var(--text2); text-align: center;
+      padding: 3px 8px 1px;
+      flex-shrink: 0; white-space: nowrap; letter-spacing: 0.5px;
+      position: fixed; bottom: 64px; left: 0; right: 0: z-index: 49;
+      pointer-events: none; background: transparent;
+    }
+    .hint-bar.stamp-on { color: var(--accent); font-weight: 700; }
+
+    /* ═══════════════════════ DAY MODAL ═══════════════════════ */
+    .overlay {
+      position: fixed; inset: 0: z-index: 200;
+      background: rgba(0,0,0,0.8);
+      display: flex; align-items: flex-end; justify-content: center;
+    }
+    .overlay.hide { display: none; }
+
+    .modal {
+      background: var(--bg2); width: 100%; max-width: 760px;
+      border-radius: 20px 20px 0 0; border-top: 2.5px solid var(--accent);
+      padding: 18px 14px 32px;
+      max-height: 88vh; overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      transition: background 0.3s;
+    }
+
+    .modal-top {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 16px;
+    }
+    .modal-date-str { font-size: 18px; font-weight: 800; color: var(--accent); }
+    .close-btn {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--bg3); border: none; color: var(--text);
+      font-size: 15px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .sec-lbl {
+      font-size: 10px; font-weight: 700; letter-spacing: 2px;
+      color: var(--text2); margin-bottom: 7px;
+    }
+
+    /* Time + Note row */
+    .time-note-row {
+      display: flex; gap: 10px; margin-bottom: 14px;
+    }
+    .time-wrap {
+      flex-shrink: 0; display: flex; flex-direction: column;
+    }
+    .note-wrap { flex: 1; display: flex; flex-direction: column; }
+
+    .time-input {
+      height: 50px; width: 120px;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: var(--r); color: var(--text);
+      font-size: 18px; font-weight: 700; font-family: inherit;
+      padding: 0 10px; -webkit-appearance: none; cursor: pointer;
+      transition: border-color 0.15s, background 0.3s;
+    }
+    .time-input:focus { outline: none; border-color: var(--accent); }
+    .time-clear-btn {
+      font-size: 9px; color: var(--text2); background: none; border: none;
+      cursor: pointer; margin-top: 4px; text-align: center; padding: 2px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .time-clear-btn:active { color: var(--sun); }
+
+    .note-area {
+      flex: 1; min-height: 80px;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: var(--r); color: var(--text);
+      font-size: 14px; font-family: inherit;
+      padding: 10px 12px; resize: none; line-height: 1.7;
+      transition: border-color 0.15s, background 0.3s;
+    }
+    .note-area:focus { outline: none; border-color: var(--accent); }
+
+    /* Image attach section */
+    .img-attach-area {
+      background: var(--bg3); border: 1px dashed var(--border);
+      border-radius: var(--r); padding: 12px;
+      margin-bottom: 14px; cursor: pointer;
+      display: flex; align-items: center; gap: 12px;
+      -webkit-tap-highlight-color: transparent;
+      transition: border-color 0.15s, background 0.3s;
+    }
+    .img-attach-area:active { border-color: var(--accent); }
+    .img-attach-area.has-img { border-style: solid; border-color: rgba(128,128,0,0.4); }
+
+    .img-attach-thumb {
+      width: 56px; height: 56px; border-radius: 6px; overflow: hidden;
+      flex-shrink: 0; background: var(--bg2);
+      display: flex; align-items: center; justify-content: center; font-size: 24px;
+    }
+    .img-attach-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .img-attach-info { flex: 1; }
+    .img-attach-label { font-size: 13px; color: var(--text); font-weight: 600; }
+    .img-attach-sub   { font-size: 10px; color: var(--text2); margin-top: 2px; }
+    .img-remove-btn {
+      background: none; border: 1px solid var(--border);
+      color: var(--sun); font-size: 11px; padding: 5px 10px;
+      border-radius: var(--r); cursor: pointer; flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Stamp grid in modal */
+    .modal-stamps-grid {
+      display: grid; grid-template-columns: repeat(6, 1fr);
+      gap: 7px; margin-bottom: 16px;
+    }
+
+    .m-stamp {
+      border: 2px solid var(--border); border-radius: var(--r);
+      background: var(--bg3); padding: 7px 4px; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+      -webkit-tap-highlight-color: transparent;
+      transition: border-color 0.1s, background 0.1s;
+    }
+    .m-stamp.on { border-color: var(--accent); background: rgba(128,100,0,0.1); }
+    .m-thumb {
+      width: 38px; height: 38px; border-radius: 6px; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; background: var(--bg2);
+    }
+    .m-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .m-name { font-size: 8px; color: var(--text2); text-align: center; line-height: 1.3; }
+
+    .save-btn {
+      width: 100%; background: var(--accent); color: var(--actext); border: none;
+      padding: 14px; border-radius: var(--r);
+      font-size: 15px; font-weight: 900; letter-spacing: 3px; cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ═══════════════════════ STAMP MANAGER ═══════════════════════ */
+    .manager {
+      position: fixed; inset: 0; z-index: 300;
+      background: var(--bg); display: flex; flex-direction: column;
+      transition: background 0.3s;
+    }
+    .manager.hide { display: none; }
+
+    .mgr-hdr {
+      background: var(--bg2); border-bottom: 1.5px solid var(--border);
+      padding: 13px 14px; display: flex; align-items: center; gap: 12px;
+      flex-shrink: 0; position: relative;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .mgr-hdr::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, var(--accent), transparent 60%);
+    }
+    .back-btn {
+      background: none; border: 1px solid var(--border); color: var(--text);
+      padding: 8px 14px; border-radius: var(--r); font-size: 13px; cursor: pointer;
+      -webkit-tap-highlight-color: transparent; transition: border-color 0.2s;
+    }
+    .back-btn:active { border-color: var(--accent); color: var(--accent); }
+    .mgr-title { font-size: 16px; font-weight: 900; letter-spacing: 3px; color: var(--accent); }
+
+    .mgr-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px 14px; }
+
+    .cat-section { margin-bottom: 28px; }
+    .cat-title {
+      font-size: 11px; font-weight: 700; letter-spacing: 2px; color: var(--text2);
+      margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+    }
+    .slot-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+
+    .slot {
+      background: var(--bg2); border: 2px dashed var(--border);
+      border-radius: 12px; padding: 12px 6px;
+      display: flex; flex-direction: column; align-items: center; gap: 7px;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+      transition: border-color 0.15s, background 0.3s;
+    }
+    .slot:active { border-color: var(--accent); }
+    .slot.uploaded { border-style: solid; border-color: rgba(128,100,0,0.4); }
+    .slot-thumb {
+      width: 58px; height: 58px; border-radius: 10px; overflow: hidden;
+      background: var(--bg3); display: flex; align-items: center; justify-content: center;
+      font-size: 30px;
+    }
+    .slot-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .slot-name { font-size: 11px; font-weight: 600; text-align: center; line-height: 1.3; }
+    .slot-action { font-size: 10px; color: var(--accent); text-align: center; }
+
+    /* ═══════════════════════ IMAGE VIEWER ═══════════════════════ */
+    .img-viewer {
+      position: fixed; inset: 0; z-index: 500;
+      background: rgba(0,0,0,0.96);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .img-viewer.hide { display: none; }
+    .viewer-img {
+      max-width: 95vw; max-height: 90vh; object-fit: contain;
+      border-radius: 8px;
+    }
+    .viewer-close {
+      position: absolute; top: 16px; right: 16px;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(255,255,255,0.15); border: none; color: #fff;
+      font-size: 18px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .hide { display: none !important; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════ HEADER ══════════ -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-main">SKZ</div>
+    <div class="logo-sub">SCHEDULE</div>
+  </div>
+  <div class="nav-group">
+    <button class="nav-btn" id="prevBtn">‹</button>
+    <div class="month-disp" id="monthDisp">-</div>
+    <button class="nav-btn" id="nextBtn">›</button>
+  </div>
+  <div class="header-right">
+    <button class="today-btn" id="todayBtn">TODAY</button>
+    <button class="theme-btn" id="themeBtn" title="テーマ変更"></button>
+    <button class="mgr-btn" id="mgrBtn">スタンプ管理</button>
+  </div>
+</header>
+
+<!-- ══════════ THEME PICKER ══════════ -->
+<div class="theme-picker hide" id="themePicker"></div>
+
+<!-- ══════════ WEEKDAYS (Mon–Sun) ══════════ -->
+<div class="weekdays">
+  <div class="wd">月</div>
+  <div class="wd">火</div>
+  <div class="wd">水</div>
+  <div class="wd">木</div>
+  <div class="wd">金</div>
+  <div class="wd sat">土</div>
+  <div class="wd sun">日</div>
+</div>
+
+<!-- ══════════ CALENDAR + DETAIL ══════════ -->
+<div class="cal-area">
+  <div class="cal-grid" id="calGrid"></div>
+</div>
+<div class="detail-panel" id="detailPanel">
+  <div class="detail-empty">← 日付をタップすると詳細が表示されます</div>
+</div>
+
+<!-- ══════════ HINT + PALETTE ══════════ -->
+<div class="hint-bar" id="hintBar">✍️ 日付をタップして編集 ／ スタンプを選んで貼り付け</div>
+<div class="palette">
+  <button class="text-mode-btn active" id="textModeBtn">
+    <span>✍️</span><span class="btn-label">TEXT</span>
+  </button>
+  <div class="pal-sep"></div>
+  <div class="pal-stamps" id="palArea"></div>
+</div>
+
+<!-- ══════════ DAY MODAL ══════════ -->
+<div class="overlay hide" id="dayOverlay">
+  <div class="modal">
+    <div class="modal-top">
+      <div class="modal-date-str" id="modalDateStr"></div>
+      <button class="close-btn" id="closeModal">✕</button>
+    </div>
+
+    <div class="sec-lbl">時間・メモ</div>
+    <div class="time-note-row">
+      <div class="time-wrap">
+        <div class="sec-lbl" style="margin-bottom:4px">⏰ 時間</div>
+        <input type="time" class="time-input" id="timeInput">
+        <button class="time-clear-btn" id="timeClearBtn">クリア</button>
+      </div>
+      <div class="note-wrap">
+        <div class="sec-lbl" style="margin-bottom:4px">📝 メモ</div>
+        <textarea class="note-area" id="noteArea" placeholder="スケジュールを入力..."></textarea>
+      </div>
+    </div>
+
+    <div class="sec-lbl">📷 写真</div>
+    <div class="img-attach-area" id="imgAttachArea">
+      <div class="img-attach-thumb" id="imgAttachThumb">📷</div>
+      <div class="img-attach-info">
+        <div class="img-attach-label" id="imgAttachLabel">写真を添付する</div>
+        <div class="img-attach-sub">タップして選択（表示はタップ時のみ）</div>
+      </div>
+      <button class="img-remove-btn hide" id="imgRemoveBtn">削除</button>
+    </div>
+
+    <div class="sec-lbl">スタンプ</div>
+    <div class="modal-stamps-grid" id="modalStampsGrid"></div>
+    <button class="save-btn" id="saveBtn">SAVE</button>
+  </div>
+</div>
+
+<!-- ══════════ STAMP MANAGER ══════════ -->
+<div class="manager hide" id="stampMgr">
+  <div class="mgr-hdr">
+    <button class="back-btn" id="backBtn">← 戻る</button>
+    <div class="mgr-title">STAMP MANAGER</div>
+  </div>
+  <div class="mgr-body" id="mgrBody"></div>
+</div>
+
+<!-- ══════════ IMAGE VIEWER ══════════ -->
+<div class="img-viewer hide" id="imgViewer">
+  <img class="viewer-img" id="viewerImg" src="" alt="添付写真">
+  <button class="viewer-close" id="viewerClose">✕</button>
+</div>
+
+<!-- File inputs -->
+<input type="file" id="fileIn" accept="image/*" style="display:none">
+<input type="file" id="dayImgIn" accept="image/*" style="display:none">
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════
+// THEMES
+// ═══════════════════════════════════════════════════════
+const THEMES = {
+  dark: {
+    name:'ダーク', swatch:'#111118',
+    bg:'#09090d', bg2:'#111118', bg3:'#1a1a24',
+    accent:'#ffd600', actext:'#000000',
+    text:'#ededf5', text2:'#50506a', border:'#1e1e2e',
+    sun:'#ff5252', sat:'#4d8cff',
+    pat:'rgba(255,214,0,0.018)', wm:'rgba(255,214,0,0.028)',
+  },
+  offwhite: {
+    name:'オフホワイト', swatch:'#f0ede6',
+    bg:'#f5f2eb', bg2:'#eeeae0', bg3:'#e6e2d6',
+    accent:'#b8820a', actext:'#ffffff',
+    text:'#1e1a10', text2:'#888070', border:'#d8d2c0',
+    sun:'#cc2222', sat:'#1155aa',
+    pat:'rgba(0,0,0,0.022)', wm:'rgba(0,0,0,0.055)',
+  },
+  pink: {
+    name:'ピンク', swatch:'#ffd6e8',
+    bg:'#fff2f6', bg2:'#ffe8f2', bg3:'#ffdaec',
+    accent:'#c2005a', actext:'#ffffff',
+    text:'#2d1020', text2:'#b08090', border:'#f8c8dc',
+    sun:'#cc1111', sat:'#881199',
+    pat:'rgba(200,0,80,0.018)', wm:'rgba(200,0,80,0.04)',
+  },
+  lavender: {
+    name:'ラベンダー', swatch:'#e0d4ff',
+    bg:'#f6f2ff', bg2:'#ede6ff', bg3:'#e4daff',
+    accent:'#5c2eb8', actext:'#ffffff',
+    text:'#180a30', text2:'#9080b8', border:'#d8ccf8',
+    sun:'#cc1111', sat:'#1144cc',
+    pat:'rgba(90,40,180,0.018)', wm:'rgba(90,40,180,0.04)',
+  },
+  mint: {
+    name:'ミント', swatch:'#c8f0e0',
+    bg:'#f0fff8', bg2:'#dff8ee', bg3:'#ccf0e0',
+    accent:'#006b5c', actext:'#ffffff',
+    text:'#0a2820', text2:'#5a9a80', border:'#b0e8d0',
+    sun:'#cc1111', sat:'#1155cc',
+    pat:'rgba(0,100,80,0.018)', wm:'rgba(0,100,80,0.04)',
+  },
+  sky: {
+    name:'スカイ', swatch:'#c8e0ff',
+    bg:'#f0f8ff', bg2:'#e0eeff', bg3:'#d0e6ff',
+    accent:'#0052a8', actext:'#ffffff',
+    text:'#081828', text2:'#5888b0', border:'#b8d4f8',
+    sun:'#cc1111', sat:'#0044bb',
+    pat:'rgba(0,60,140,0.018)', wm:'rgba(0,60,140,0.04)',
+  },
+};
+
+let curThemeKey = localStorage.getItem('skzTheme_v3') || 'dark';
+
+function applyTheme(key) {
+  curThemeKey = key;
+  localStorage.setItem('skzTheme_v3', key);
+  const t = THEMES[key];
+  const r = document.documentElement.style;
+  r.setProperty('--bg',     t.bg);
+  r.setProperty('--bg2',    t.bg2);
+  r.setProperty('--bg3',    t.bg3);
+  r.setProperty('--accent', t.accent);
+  r.setProperty('--actext', t.actext);
+  r.setProperty('--text',   t.text);
+  r.setProperty('--text2',  t.text2);
+  r.setProperty('--border', t.border);
+  r.setProperty('--sun',    t.sun);
+  r.setProperty('--sat',    t.sat);
+  r.setProperty('--pat',    t.pat);
+  r.setProperty('--wm',     t.wm);
+  document.getElementById('themeBtn').style.background = t.swatch;
+  // Update active swatch
+  document.querySelectorAll('.swatch-circle').forEach(el => {
+    el.classList.toggle('active', el.dataset.key === key);
+  });
+}
+
+function buildThemePicker() {
+  const picker = document.getElementById('themePicker');
+  picker.innerHTML = '';
+  Object.entries(THEMES).forEach(([key, t]) => {
+    const sw = document.createElement('div');
+    sw.className = 'theme-swatch';
+    sw.innerHTML = `
+      <div class="swatch-circle${key===curThemeKey?' active':''}" data-key="${key}"
+           style="background:${t.swatch}"></div>
+      <div class="swatch-name">${t.name}</div>`;
+    sw.addEventListener('click', () => {
+      applyTheme(key);
+      document.getElementById('themePicker').classList.add('hide');
+    });
+    picker.appendChild(sw);
+  });
+}
+
+document.getElementById('themeBtn').addEventListener('click', e => {
+  e.stopPropagation();
+  document.getElementById('themePicker').classList.toggle('hide');
+});
+document.addEventListener('click', e => {
+  if (!e.target.closest('#themePicker') && !e.target.closest('#themeBtn'))
+    document.getElementById('themePicker').classList.add('hide');
+});
+
+// ═══════════════════════════════════════════════════════
+// STAMPS  (18 total)
+// ═══════════════════════════════════════════════════════
+const STAMPS = [
+  { id:'bc', name:'Bang Chan',  cat:'member',   emoji:'🐺' },
+  { id:'ln', name:'Lee Know',   cat:'member',   emoji:'🐱' },
+  { id:'cb', name:'Changbin',   cat:'member',   emoji:'🐸' },
+  { id:'hj', name:'Hyunjin',    cat:'member',   emoji:'🦋' },
+  { id:'hn', name:'Han',        cat:'member',   emoji:'🐹' },
+  { id:'fl', name:'Felix',      cat:'member',   emoji:'🐰' },
+  { id:'sm', name:'Seungmin',   cat:'member',   emoji:'🐶' },
+  { id:'in', name:'I.N',        cat:'member',   emoji:'🦊' },
+  { id:'kr', name:'韓国',        cat:'location', emoji:'🇰🇷' },
+  { id:'jp', name:'日本',        cat:'location', emoji:'🇯🇵' },
+  { id:'cd', name:'カムバ',      cat:'event',    emoji:'💿' },
+  { id:'lv', name:'ライブ',      cat:'event',    emoji:'🎤' },
+  { id:'pm', name:'ペンミ',      cat:'event',    emoji:'🎪' },
+  { id:'bd', name:'誕生日',      cat:'event',    emoji:'🎂' },
+  { id:'tv', name:'テレビ',      cat:'event',    emoji:'📺' },
+  { id:'rd', name:'ラジオ',      cat:'event',    emoji:'📻' },
+  { id:'dp', name:'出国',        cat:'event',    emoji:'🛫' },
+  { id:'rt', name:'帰国',        cat:'event',    emoji:'🛬' },
+];
+
+const CATS = [
+  { key:'member',   label:'MEMBERS'  },
+  { key:'location', label:'LOCATION' },
+  { key:'event',    label:'EVENTS'   },
+];
+
+const DOW_MON = ['月','火','水','木','金','土','日'];
+const DOW_JP  = ['日','月','火','水','木','金','土'];
+const JM = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+
+// ═══════════════════════════════════════════════════════
+// STATE & STORAGE
+// ═══════════════════════════════════════════════════════
+let curY = new Date().getFullYear();
+let curM = new Date().getMonth();
+let selStamp  = null;
+let selKey    = null;  // currently selected date key
+
+let db = { notes:{}, times:{}, placements:{}, images:{}, dayImages:{} };
+
+function dk(y,m,d) { return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
+
+function loadDB() {
+  try {
+    const raw = localStorage.getItem('skzSched_v3');
+    if (raw) { const p = JSON.parse(raw); Object.assign(db, p); }
+  } catch(e) {}
+}
+
+function saveDB() {
+  try { localStorage.setItem('skzSched_v3', JSON.stringify(db)); }
+  catch(e) { alert('⚠️ 保存できませんでした。\nストレージの空き容量が不足しています。\n古い写真の添付を削除してください。'); }
+}
+
+// ═══════════════════════════════════════════════════════
+// IMAGE COMPRESSION
+// ═══════════════════════════════════════════════════════
+function compress(file, maxPx, quality) {
+  return new Promise(res => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const r = Math.min(maxPx / img.width, maxPx / img.height, 1);
+        const c = document.createElement('canvas');
+        c.width  = Math.round(img.width  * r);
+        c.height = Math.round(img.height * r);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        res(c.toDataURL('image/jpeg', quality));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// STAMP THUMBNAIL HELPER
+// ═══════════════════════════════════════════════════════
+function makeThumb(stampId, px) {
+  const def = STAMPS.find(s => s.id === stampId);
+  if (!def) return null;
+  const br = px <= 24 ? 3 : 5;
+  const el = document.createElement('div');
+  el.style.cssText = `width:${px}px;height:${px}px;border-radius:${br}px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:${Math.round(px*0.55)}px;background:var(--bg3);flex-shrink:0;`;
+  if (db.images[stampId]) {
+    const img = document.createElement('img');
+    img.src = db.images[stampId];
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+    el.appendChild(img);
+  } else {
+    el.textContent = def.emoji;
+  }
+  return el;
+}
+
+// ═══════════════════════════════════════════════════════
+// HINT BAR
+// ═══════════════════════════════════════════════════════
+function updateHint() {
+  const bar = document.getElementById('hintBar');
+  if (selStamp) {
+    const def = STAMPS.find(s => s.id === selStamp);
+    bar.textContent = `${def?.emoji} ${def?.name} 選択中 ─ 日付をタップして貼り付け／もう一度タップで解除`;
+    bar.classList.add('stamp-on');
+  } else {
+    bar.textContent = '✍️ 日付をタップして編集 ／ 下のスタンプを選んで日付に貼り付け';
+    bar.classList.remove('stamp-on');
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// CALENDAR
+// ═══════════════════════════════════════════════════════
+function renderCalendar() {
+  document.getElementById('monthDisp').textContent = `${curY}年${JM[curM]}`;
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+
+  // Monday-start: shift getDay() so Mon=0 … Sun=6
+  const firstDowRaw  = new Date(curY, curM, 1).getDay();
+  const firstDow     = (firstDowRaw + 6) % 7;  // Mon-based
+  const daysInMo     = new Date(curY, curM + 1, 0).getDate();
+  const daysInPrev   = new Date(curY, curM, 0).getDate();
+
+  const today   = new Date();
+  const todayKey = dk(today.getFullYear(), today.getMonth(), today.getDate());
+
+  for (let i = firstDow - 1; i >= 0; i--)
+    grid.appendChild(makeCell(curY, curM - 1, daysInPrev - i, true, todayKey));
+
+  for (let d = 1; d <= daysInMo; d++)
+    grid.appendChild(makeCell(curY, curM, d, false, todayKey));
+
+  const total = Math.ceil((firstDow + daysInMo) / 7) * 7;
+  for (let d = 1; d <= total - firstDow - daysInMo; d++)
+    grid.appendChild(makeCell(curY, curM + 1, d, true, todayKey));
+}
+
+function makeCell(y, m, d, other, todayKey) {
+  const real = new Date(y, m, d);
+  const ry = real.getFullYear(), rm = real.getMonth(), rd = real.getDate();
+  const key  = dk(ry, rm, rd);
+  const dow  = real.getDay(); // 0=Sun…6=Sat
+  const monDow = (dow + 6) % 7; // Mon-based col 0–6
+
+  const places = db.placements[key] || [];
+  const note   = db.notes[key] || '';
+  const time   = db.times[key] || '';
+
+  const cell = document.createElement('div');
+  let cls = 'day';
+  if (other)                     cls += ' other';
+  if (key === todayKey)          cls += ' today';
+  if (key === selKey)            cls += ' selected';
+  if (places.length || note || time || db.dayImages[key]) cls += ' has-data';
+  cell.className = cls;
+
+  // Day number
+  const numEl = document.createElement('div');
+  let numCls = 'day-num';
+  if (monDow === 5) numCls += ' mon-sat';  // Sat col
+  if (monDow === 6) numCls += ' mon-sun';  // Sun col
+  numEl.className = numCls;
+  numEl.textContent = rd;
+  cell.appendChild(numEl);
+
+  // Camera badge
+  if (db.dayImages[key]) {
+    const badge = document.createElement('div');
+    badge.className = 'img-badge'; badge.textContent = '📷';
+    cell.appendChild(badge);
+  }
+
+  // Stamps
+  if (places.length > 0) {
+    const row = document.createElement('div');
+    row.className = 'stamp-row';
+    places.slice(0, 5).forEach(sid => {
+      const mini = makeThumb(sid, 20);
+      if (mini) row.appendChild(mini);
+    });
+    if (places.length > 5) {
+      const more = document.createElement('div');
+      more.className = 's-more'; more.textContent = '+' + (places.length - 5);
+      row.appendChild(more);
+    }
+    cell.appendChild(row);
+  }
+
+  // Time
+  if (time) {
+    const te = document.createElement('div');
+    te.className = 'day-time-preview'; te.textContent = '⏰' + time;
+    cell.appendChild(te);
+  }
+
+  // Note
+  if (note) {
+    const ne = document.createElement('div');
+    ne.className = 'day-note-preview'; ne.textContent = note.substring(0, 28);
+    cell.appendChild(ne);
+  }
+
+  // Click
+  cell.addEventListener('click', () => {
+    if (selStamp) {
+      const arr = [...(db.placements[key] || [])];
+      const idx = arr.indexOf(selStamp);
+      if (idx >= 0) arr.splice(idx, 1); else arr.push(selStamp);
+      if (arr.length > 0) db.placements[key] = arr; else delete db.placements[key];
+      saveDB(); renderCalendar(); renderDetail();
+    } else {
+      selKey = key;
+      renderCalendar();
+      renderDetail();
+    }
+  });
+
+  return cell;
+}
+
+// ═══════════════════════════════════════════════════════
+// DETAIL PANEL
+// ═══════════════════════════════════════════════════════
+function renderDetail() {
+  const panel = document.getElementById('detailPanel');
+  if (!selKey) {
+    panel.innerHTML = '<div class="detail-empty">← 日付をタップすると詳細が表示されます</div>';
+    return;
+  }
+
+  const [sy, sm, sd] = selKey.split('-').map(Number);
+  const real = new Date(sy, sm - 1, sd);
+  const dow  = DOW_JP[real.getDay()];
+  const dateStr = `${sy}�t${sm}月${sd}日（${dow}）`;
+
+  const places  = db.placements[selKey] || [];
+  const note    = db.notes[selKey] || '';
+  const time    = db.times[selKey] || '';
+  const dayImg  = db.dayImages[selKey] || '';
+
+  panel.innerHTML = '';
+
+  // Top row
+  const top = document.createElement('div');
+  top.className = 'detail-top';
+  top.innerHTML = `<div class="detail-date-str">${dateStr}</div>`;
+  const editBtn = document.createElement('button');
+  editBtn.className = 'detail-edit-btn'; editBtn.textContent = '編集';
+  editBtn.addEventListener('click', () => openModal(sy, sm - 1, sd));
+  top.appendChild(editBtn);
+  panel.appendChild(top);
+
+  // Stamps
+  if (places.length > 0) {
+    const sec = document.createElement('div');
+    sec.className = 'detail-section';
+    const lbl = document.createElement('div'); lbl.className = 'detail-lbl'; lbl.textContent = 'STAMPS';
+    sec.appendChild(lbl);
+    const row = document.createElement('div'); row.className = 'detail-stamps-row';
+    places.forEach(sid => {
+      const def = STAMPS.find(s => s.id === sid);
+      if (!def) return;
+      const wrap = document.createElement('div'); wrap.className = 'detail-stamp';
+      const th = document.createElement('div'); th.className = 'detail-stamp-thumb';
+      if (db.images[sid]) {
+        const img = document.createElement('img'); img.src = db.images[sid];
+        th.appendChild(img);
+      } else { th.textContent = def.emoji; }
+      const nm = document.createElement('div'); nm.className = 'detail-stamp-name'; nm.textContent = def.name;
+      wrap.appendChild(th); wrap.appendChild(nm); row.appendChild(wrap);
+    });
+    sec.appendChild(row); panel.appendChild(sec);
+  }
+
+  // Time
+  if (time) {
+    const sec = document.createElement('div'); sec.className = 'detail-section';
+    const lbl = document.createElement('div'); lbl.className = 'detail-lbl'; lbl.textContent = 'TIME';
+    const tv  = document.createElement('div'); tv.className = 'detail-time';
+    tv.innerHTML = `<span class="detail-time-icon">⏰</span><span>${time}</span>`;
+    sec.appendChild(lbl); sec.appendChild(tv); panel.appendChild(sec);
+  }
+
+  // Note
+  if (note) {
+    const sec = document.createElement('div'); sec.className = 'detail-section';
+    const lbl = document.createElement('div'); lbl.className = 'detail-lbl'; lbl.textContent = 'MEMO';
+    const nt  = document.createElement('div'); nt.className = 'detail-note-text'; nt.textContent = note;
+    sec.appendChild(lbl); sec.appendChild(nt); panel.appendChild(sec);
+  }
+
+  // Image
+  if (dayImg) {
+    const sec = document.createElement('div'); sec.className = 'detail-section';
+    const lbl = document.createElement('div'); lbl.className = 'detail-lbl'; lbl.textContent = 'PHOTO';
+    const btn = document.createElement('div'); btn.className = 'detail-img-btn';
+    btn.innerHTML = `
+      <div class="detail-img-preview"><img src="${dayImg}" alt="photo"></div>
+      <div>
+        <div class="detail-img-label">写真を見る</div>
+        <div class="detail-img-sub">タップして拡大表示</div>
+      </div>`;
+    btn.addEventListener('click', () => openViewer(dayImg));
+    sec.appendChild(lbl); sec.appendChild(btn); panel.appendChild(sec);
+  }
+
+  // Empty state
+  if (!places.length && !note && !time && !dayImg) {
+    const empty = document.createElement('div');
+    empty.className = 'detail-empty';
+    empty.textContent = '「編集」をタップしてスケジュールを追加';
+    panel.appendChild(empty);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// PALETTE
+// ═══════════════════════════════════════════════════════
+function renderPalette() {
+  const area = document.getElementById('palArea');
+  area.innerHTML = '';
+  STAMPS.forEach(def => {
+    const el = document.createElement('div');
+    el.className = 'p-stamp' + (selStamp === def.id ? ' sel' : '');
+    if (db.images[def.id]) {
+      const img = document.createElement('img'); img.src = db.images[def.id]; el.appendChild(img);
+    } else { el.textContent = def.emoji; }
+    const lbl = document.createElement('div'); lbl.className = 'p-lbl';
+    lbl.textContent = def.name.length > 4 ? def.name.slice(0, 4) : def.name;
+    el.appendChild(lbl);
+    el.addEventListener('click', () => {
+      selStamp = (selStamp === def.id) ? null : def.id;
+      document.getElementById('textModeBtn').classList.toggle('active', !selStamp);
+      renderPalette(); updateHint();
+    });
+    area.appendChild(el);
+  });
+}
+
+document.getElementById('textModeBtn').addEventListener('click', () => {
+  selStamp = null;
+  document.getElementById('textModeBtn').classList.add('active');
+  renderPalette(); updateHint();
+});
+
+// ═══════════════════════════════════════════════════════
+// DAY MODAL
+// ═══════════════════════════════════════════════════════
+let editKey   = null;
+let modalAct  = new Set();
+let pendingDayImg = null;  // base64 staged but not saved yet
+
+function openModal(y, m, d) {
+  const real = new Date(y, m, d);
+  editKey = dk(real.getFullYear(), real.getMonth(), real.getDate());
+
+  const dow = DOW_JP[real.getDay()];
+  document.getElementById('modalDateStr').textContent =
+    `${real.getFullYear()}�t${real.getMonth()+1}月${real.getDate()}日（${dow}）`;
+
+  document.getElementById('noteArea').value  = db.notes[editKey] || '';
+  document.getElementById('timeInput').value = db.times[editKey] || '';
+  modalAct = new Set(db.placements[editKey] || []);
+
+  pendingDayImg = db.dayImages[editKey] || null;
+  updateImgAttachUI();
+  renderModalStamps();
+  document.getElementById('dayOverlay').classList.remove('hide');
+}
+
+function updateImgAttachUI() {
+  const area  = document.getElementById('imgAttachArea');
+  const thumb = document.getElementById('imgAttachThumb');
+  const label = document.getElementById('imgAttachLabel');
+  const remBtn = document.getElementById('imgRemoveBtn');
+  if (pendingDayImg) {
+    area.classList.add('has-img');
+    thumb.innerHTML = `<img src="${pendingDayImg}" alt="preview" style="width:100%;height:100%;object-fit:cover;border-radius:4px;">`;
+    label.textContent = '写真あり（タップして変更）';
+    remBtn.classList.remove('hide');
+  } else {
+    area.classList.remove('has-img');
+    thumb.innerHTML = '📷';
+    label.textContent = '写真を添付する';
+    remBtn.classList.add('hide');
+  }
+}
+
+document.getElementById('imgAttachArea').addEventListener('click', e => {
+  if (e.target.closest('#imgRemoveBtn')) return;
+  document.getElementById('dayImgIn').click();
+});
+document.getElementById('imgRemoveBtn').addEventListener('click', e => {
+  e.stopPropagation();
+  pendingDayImg = null; updateImgAttachUI();
+});
+
+document.getElementById('timeClearBtn').addEventListener('click', () => {
+  document.getElementById('timeInput').value = '';
+});
+
+function renderModalStamps() {
+  const grid = document.getElementById('modalStampsGrid');
+  grid.innerHTML = '';
+  STAMPS.forEach(def => {
+    const item = document.createElement('div');
+    item.className = 'm-stamp' + (modalAct.has(def.id) ? ' on' : '');
+    const th = document.createElement('div'); th.className = 'm-thumb';
+    if (db.images[def.id]) {
+      const img = document.createElement('img'); img.src = db.images[def.id]; th.appendChild(img);
+    } else { th.textContent = def.emoji; }
+    const nm = document.createElement('div'); nm.className = 'm-name'; nm.textContent = def.name;
+    item.appendChild(th); item.appendChild(nm);
+    item.addEventListener('click', () => {
+      if (modalAct.has(def.id)) modalAct.delete(def.id); else modalAct.add(def.id);
+      item.classList.toggle('on');
+    });
+    grid.appendChild(item);
+  });
+}
+
+document.getElementById('saveBtn').addEventListener('click', () => {
+  const text = document.getElementById('noteArea').value.trim();
+  const time = document.getElementById('timeInput').value;
+
+  if (text) db.notes[editKey] = text; else delete db.notes[editKey];
+  if (time) db.times[editKey] = time; else delete db.times[editKey];
+  if (modalAct.size > 0) db.placements[editKey] = [...modalAct]; else delete db.placements[editKey];
+  if (pendingDayImg) db.dayImages[editKey] = pendingDayImg; else delete db.dayImages[editKey];
+
+  saveDB();
+  if (selKey === editKey) renderDetail();
+  renderCalendar();
+  document.getElementById('dayOverlay').classList.add('hide');
+});
+
+document.getElementById('closeModal').addEventListener('click', () =>
+  document.getElementById('dayOverlay').classList.add('hide'));
+document.getElementById('dayOverlay').addEventListener('click', e => {
+  if (e.target.id === 'dayOverlay') document.getElementById('dayOverlay').classList.add('hide');
+});
+
+// Day image upload
+document.getElementById('dayImgIn').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  pendingDayImg = await compress(file, 600, 0.68);
+  updateImgAttachUI();
+  e.target.value = '';
+});
+
+// ═══════════════════════════════════════════════════════
+// IMAGE VIEWER
+// ═══════════════════════════════════════════════════════
+function openViewer(src) {
+  document.getElementById('viewerImg').src = src;
+  document.getElementById('imgViewer').classList.remove('hide');
+}
+document.getElementById('viewerClose').addEventListener('click', () =>
+  document.getElementById('imgViewer').classList.add('hide'));
+document.getElementById('imgViewer').addEventListener('click', e => {
+  if (e.target.id === 'imgViewer') document.getElementById('imgViewer').classList.add('hide');
+});
+
+// ═══════════════════════════════════════════════════════
+// STAMP MANAGER
+// ═══════════════════════════════════════════════════════
+let uploadTarget = null;
+
+function renderManager() {
+  const body = document.getElementById('mgrBody');
+  body.innerHTML = '';
+  CATS.forEach(cat => {
+    const stamps = STAMPS.filter(s => s.cat === cat.key);
+    const sec = document.createElement('div'); sec.className = 'cat-section';
+    const t = document.createElement('div'); t.className = 'cat-title'; t.textContent = cat.label;
+    sec.appendChild(t);
+    const sg = document.createElement('div'); sg.className = 'slot-grid';
+    stamps.forEach(def => {
+      const slot = document.createElement('div');
+      slot.className = 'slot' + (db.images[def.id] ? ' uploaded' : '');
+      const th = document.createElement('div'); th.className = 'slot-thumb';
+      if (db.images[def.id]) {
+        const img = document.createElement('img'); img.src = db.images[def.id]; th.appendChild(img);
+      } else { th.textContent = def.emoji; }
+      const nm = document.createElement('div'); nm.className = 'slot-name'; nm.textContent = def.name;
+      const ac = document.createElement('div'); ac.className = 'slot-action';
+      ac.textContent = db.images[def.id] ? '✓ 変更する' : '+ アップロード';
+      slot.appendChild(th); slot.appendChild(nm); slot.appendChild(ac);
+      slot.addEventListener('click', () => { uploadTarget = def.id; document.getElementById('fileIn').click(); });
+      sg.appendChild(slot);
+    });
+    sec.appendChild(sg); body.appendChild(sec);
+  });
+}
+
+document.getElementById('mgrBtn').addEventListener('click', () => {
+  renderManager(); document.getElementById('stampMgr').classList.remove('hide');
+});
+document.getElementById('backBtn').addEventListener('click', () => {
+  document.getElementById('stampMgr').classList.add('hide');
+  renderPalette(); renderCalendar();
+});
+
+document.getElementById('fileIn').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  if (!file || !uploadTarget) return;
+  db.images[uploadTarget] = await compress(file, 180, 0.78);
+  saveDB(); renderManager();
+  e.target.value = ''; uploadTarget = null;
+});
+
+// ═══════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════
+document.getElementById('prevBtn').addEventListener('click', () => {
+  if (curM === 0) { curM = 11; curY--; } else curM--;
+  renderCalendar();
+});
+document.getElementById('nextBtn').addEventListener('click', () => {
+  if (curM === 11) { curM = 0; curY++; } else curM++;
+  renderCalendar();
+});
+document.getElementById('todayBtn').addEventListener('click', () => {
+  const n = new Date(); curY = n.getFullYear(); curM = n.getMonth();
+  const todayKey = dk(n.getFullYear(), n.getMonth(), n.getDate());
+  selKey = todayKey;
+  renderCalendar(); renderDetail();
+});
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+loadDB();
+buildThemePicker();
+applyTheme(curThemeKey);
+
+// Auto-select today
+const nowDate = new Date();
+selKey = dk(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate());
+curY = nowDate.getFullYear(); curM = nowDate.getMonth();
+
+renderCalendar();
+renderPalette();
+renderDetail();
+updateHint();
+</script>
+</body>
+</html>
