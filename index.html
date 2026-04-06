@@ -1158,6 +1158,24 @@ function openModal(y, m, d) {
   updateImgAttachUI();
   renderModalStamps();
   document.getElementById('dayOverlay').classList.remove('hide');
+  // iOS Safari: lock body scroll so modal can scroll
+  const scrollY = window.scrollY;
+  document.body.style.overflow = 'hidden';
+  document.body.style.position = 'fixed';
+  document.body.style.top = `-${scrollY}px`;
+  document.body.style.width = '100%';
+  document.body.dataset.scrollY = scrollY;
+}
+
+function closeDayOverlay() {
+  document.getElementById('dayOverlay').classList.add('hide');
+  // iOS Safari: restore body scroll
+  const scrollY = parseInt(document.body.dataset.scrollY || '0');
+  document.body.style.overflow = '';
+  document.body.style.position = '';
+  document.body.style.top = '';
+  document.body.style.width = '';
+  window.scrollTo(0, scrollY);
 }
 
 function updateImgAttachUI() {
@@ -1223,7 +1241,7 @@ document.getElementById('saveBtn').addEventListener('click', () => {
   saveDB();
   if (selKey === editKey) renderDetail();
   renderCalendar();
-  document.getElementById('dayOverlay').classList.add('hide');
+  closeDayOverlay();
 });
 
 document.getElementById('clearBtn').addEventListener('click', () => {
@@ -1232,12 +1250,11 @@ document.getElementById('clearBtn').addEventListener('click', () => {
   delete db.placements[editKey]; delete db.dayImages[editKey];
   pendingDayImg = null;
   saveDB(); renderCalendar(); renderDetail();
-  document.getElementById('dayOverlay').classList.add('hide');
+  closeDayOverlay();
 });
-document.getElementById('closeModal').addEventListener('click', () =>
-  document.getElementById('dayOverlay').classList.add('hide'));
+document.getElementById('closeModal').addEventListener('click', () => closeDayOverlay());
 document.getElementById('dayOverlay').addEventListener('click', e => {
-  if (e.target.id === 'dayOverlay') document.getElementById('dayOverlay').classList.add('hide');
+  if (e.target.id === 'dayOverlay') closeDayOverlay();
 });
 
 // Day image upload
