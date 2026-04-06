@@ -1015,7 +1015,7 @@ function renderDetail() {
   const [sy, sm, sd] = selKey.split('-').map(Number);
   const real = new Date(sy, sm - 1, sd);
   const dow  = DOW_JP[real.getDay()];
-  const dateStr = `${sy}�t${sm}月${sd}日（${dow}）`;
+  const dateStr = `${sy}\u5e74${sm}月${sd}日（${dow}）`;
 
   const places  = db.placements[selKey] || [];
   const note    = db.notes[selKey] || '';
@@ -1140,7 +1140,7 @@ function openModal(y, m, d) {
 
   const dow = DOW_JP[real.getDay()];
   document.getElementById('modalDateStr').textContent =
-    `${real.getFullYear()}�t${real.getMonth()+1}月${real.getDate()}日（${dow}）`;
+    `${real.getFullYear()}\u5e74${real.getMonth()+1}月${real.getDate()}日（${dow}）`;
 
   document.getElementById('noteArea').value  = db.notes[editKey] || '';
   document.getElementById('timeInput').value = db.times[editKey] || '';
