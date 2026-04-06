@@ -358,10 +358,11 @@
 
     /* ═══════════════════════ DAY MODAL ═══════════════════════ */
     .overlay {
-      position: fixed; inset: 0: z-index: 200;
+      position: fixed; inset: 0; z-index: 200;
       background: rgba(0,0,0,0.8);
       display: flex; align-items: flex-end; justify-content: center;
       padding-bottom: env(safe-area-inset-bottom, 0px);
+      overflow: hidden;
     }
     .overlay.hide { display: none; }
 
@@ -369,8 +370,10 @@
       background: var(--bg2); width: 100%; max-width: 760px;
       border-radius: 20px 20px 0 0; border-top: 2.5px solid var(--accent);
       padding: 18px 14px 24px;
-      max-height: 88vh; max-height: 88svh; overflow-y: scroll;
+      height: 88svh; height: 88vh; overflow-y: scroll;
       -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      touch-action: pan-y;
       transition: background 0.3s;
     }
 
@@ -855,8 +858,10 @@ function compress(file, maxPx, quality) {
         const c = document.createElement('canvas');
         c.width  = Math.round(img.width  * r);
         c.height = Math.round(img.height * r);
-        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-        res(c.toDataURL('image/jpeg', quality));
+        const ctx = c.getContext('2d');
+        ctx.drawImage(img, 0, 0, c.width, c.height);
+        const hasAlpha = file.type === 'image/png' || file.type === 'image/gif' || file.type === 'image/webp';
+        res(c.toDataURL(hasAlpha ? 'image/png' : 'image/jpeg', quality));
       };
       img.src = e.target.result;
     };
@@ -1158,24 +1163,10 @@ function openModal(y, m, d) {
   updateImgAttachUI();
   renderModalStamps();
   document.getElementById('dayOverlay').classList.remove('hide');
-  // iOS Safari: lock body scroll so modal can scroll
-  const scrollY = window.scrollY;
-  document.body.style.overflow = 'hidden';
-  document.body.style.position = 'fixed';
-  document.body.style.top = `-${scrollY}px`;
-  document.body.style.width = '100%';
-  document.body.dataset.scrollY = scrollY;
 }
 
 function closeDayOverlay() {
   document.getElementById('dayOverlay').classList.add('hide');
-  // iOS Safari: restore body scroll
-  const scrollY = parseInt(document.body.dataset.scrollY || '0');
-  document.body.style.overflow = '';
-  document.body.style.position = '';
-  document.body.style.top = '';
-  document.body.style.width = '';
-  window.scrollTo(0, scrollY);
 }
 
 function updateImgAttachUI() {
