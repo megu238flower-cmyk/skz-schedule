@@ -480,6 +480,11 @@
     .m-thumb img { width: 100%; height: 100%; object-fit: cover; }
     .m-name { font-size: 8px; color: var(--text2); text-align: center; line-height: 1.3; }
 
+    .entry-num {
+      font-size: 11px; color: var(--accent); font-weight: 700;
+      margin: 10px 0 4px;
+    }
+
     .clear-btn {
       width: 100%; background: transparent; color: var(--text2);
       border: 1.5px solid var(--border); padding: 12px; border-radius: var(--r);
@@ -629,15 +634,34 @@
     </div>
 
     <div class="sec-lbl">時間・メモ</div>
+    <div class="entry-num">①</div>
     <div class="time-note-row">
       <div class="time-wrap">
-        <div class="sec-lbl" style="margin-bottom:4px">⏰ 時間</div>
-        <input type="time" class="time-input" id="timeInput">
-        <button class="time-clear-btn" id="timeClearBtn">クリア</button>
+        <input type="time" class="time-input" id="timeInput0">
+        <button class="time-clear-btn" data-idx="0">クリア</button>
       </div>
       <div class="note-wrap">
-        <div class="sec-lbl" style="margin-bottom:4px">📝 メモ</div>
-        <textarea class="note-area" id="noteArea" placeholder="スケジュールを入力..."></textarea>
+        <textarea class="note-area" id="noteArea0" placeholder="予定①..."></textarea>
+      </div>
+    </div>
+    <div class="entry-num">②</div>
+    <div class="time-note-row">
+      <div class="time-wrap">
+        <input type="time" class="time-input" id="timeInput1">
+        <button class="time-clear-btn" data-idx="1">クリア</button>
+      </div>
+      <div class="note-wrap">
+        <textarea class="note-area" id="noteArea1" placeholder="予定②..."></textarea>
+      </div>
+    </div>
+    <div class="entry-num">③</div>
+    <div class="time-note-row">
+      <div class="time-wrap">
+        <input type="time" class="time-input" id="timeInput2">
+        <button class="time-clear-btn" data-idx="2">クリア</button>
+      </div>
+      <div class="note-wrap">
+        <textarea class="note-area" id="noteArea2" placeholder="予定③..."></textarea>
       </div>
     </div>
 
@@ -809,12 +833,14 @@ const STAMPS = [
   { id:'rd', name:'ラジオ',      cat:'event',    emoji:'📻' },
   { id:'dp', name:'出国',        cat:'event',    emoji:'🛫' },
   { id:'rt', name:'帰国',        cat:'event',    emoji:'🛬' },
+  { id:'mg', name:'megu',        cat:'myself',   emoji:'🌸' },
 ];
 
 const CATS = [
   { key:'member',   label:'MEMBERS'  },
   { key:'location', label:'LOCATION' },
   { key:'event',    label:'EVENTS'   },
+  { key:'myself',   label:'MYSELF'   },
 ];
 
 const DOW_MON = ['月','火','水','木','金','土','日'];
@@ -843,6 +869,13 @@ function loadDB() {
 function saveDB() {
   try { localStorage.setItem('skzSched_v3', JSON.stringify(db)); }
   catch(e) { alert('⚠️ 保存できませんでした。\nストレージの空き容量が不足しています。\n古い写真の添付を削除してください。'); }
+}
+
+// 旧形式（文字列）→新形式（配列）対応ヘルパー
+function getEntryArr(v) {
+  if (!v) return ['', '', ''];
+  if (Array.isArray(v)) { const a = v.slice(0,3); while (a.length < 3) a.push(''); return a; }
+  return [v, '', ''];
 }
 
 // ═══════════════════════════════════════════════════════
@@ -940,15 +973,17 @@ function makeCell(y, m, d, other, todayKey) {
   const monDow = (dow + 6) % 7; // Mon-based col 0–6
 
   const places = db.placements[key] || [];
-  const note   = db.notes[key] || '';
-  const time   = db.times[key] || '';
+  const notes  = getEntryArr(db.notes[key]);
+  const times  = getEntryArr(db.times[key]);
+  const note   = notes[0];
+  const time   = times[0];
 
   const cell = document.createElement('div');
   let cls = 'day';
   if (other)                     cls += ' other';
   if (key === todayKey)          cls += ' today';
   if (key === selKey)            cls += ' selected';
-  if (places.length || note || time || db.dayImages[key]) cls += ' has-data';
+  if (places.length || notes.some(n=>n) || times.some(t=>t) || db.dayImages[key]) cls += ' has-data';
   cell.className = cls;
 
   // Day number
@@ -990,11 +1025,20 @@ function makeCell(y, m, d, other, todayKey) {
     cell.appendChild(te);
   }
 
-  // Note
+  // Note (first entry)
   if (note) {
     const ne = document.createElement('div');
     ne.className = 'day-note-preview'; ne.textContent = note.substring(0, 28);
     cell.appendChild(ne);
+  }
+
+  // Show "+N件" if there are additional entries
+  const extraCount = [1,2].filter(i => notes[i] || times[i]).length;
+  if (extraCount > 0) {
+    const ex = document.createElement('div');
+    ex.className = 'day-note-preview';
+    ex.style.color = 'var(--text2)'; ex.textContent = '+' + extraCount + '件';
+    cell.appendChild(ex);
   }
 
   // Click
@@ -1031,9 +1075,10 @@ function renderDetail() {
   const dateStr = `${sy}\u5e74${sm}月${sd}日（${dow}）`;
 
   const places  = db.placements[selKey] || [];
-  const note    = db.notes[selKey] || '';
-  const time    = db.times[selKey] || '';
+  const notes   = getEntryArr(db.notes[selKey]);
+  const times   = getEntryArr(db.times[selKey]);
   const dayImg  = db.dayImages[selKey] || '';
+  const hasMultiEntry = [1,2].some(i => notes[i] || times[i]);
 
   panel.innerHTML = '';
 
@@ -1069,21 +1114,28 @@ function renderDetail() {
     sec.appendChild(row); panel.appendChild(sec);
   }
 
-  // Time
-  if (time) {
+  // Time & Note (up to 3 entries)
+  const entryNums = ['①', '②', '③'];
+  for (let i = 0; i < 3; i++) {
+    if (!times[i] && !notes[i]) continue;
     const sec = document.createElement('div'); sec.className = 'detail-section';
-    const lbl = document.createElement('div'); lbl.className = 'detail-lbl'; lbl.textContent = 'TIME';
-    const tv  = document.createElement('div'); tv.className = 'detail-time';
-    tv.innerHTML = `<span class="detail-time-icon">⏰</span><span>${time}</span>`;
-    sec.appendChild(lbl); sec.appendChild(tv); panel.appendChild(sec);
-  }
-
-  // Note
-  if (note) {
-    const sec = document.createElement('div'); sec.className = 'detail-section';
-    const lbl = document.createElement('div'); lbl.className = 'detail-lbl'; lbl.textContent = 'MEMO';
-    const nt  = document.createElement('div'); nt.className = 'detail-note-text'; nt.textContent = note;
-    sec.appendChild(lbl); sec.appendChild(nt); panel.appendChild(sec);
+    if (hasMultiEntry) {
+      const numLbl = document.createElement('div'); numLbl.className = 'detail-lbl';
+      numLbl.textContent = entryNums[i]; sec.appendChild(numLbl);
+    } else {
+      const lbl = document.createElement('div'); lbl.className = 'detail-lbl'; lbl.textContent = 'SCHEDULE';
+      sec.appendChild(lbl);
+    }
+    if (times[i]) {
+      const tv = document.createElement('div'); tv.className = 'detail-time';
+      tv.innerHTML = `<span class="detail-time-icon">⏰</span><span>${times[i]}</span>`;
+      sec.appendChild(tv);
+    }
+    if (notes[i]) {
+      const nt = document.createElement('div'); nt.className = 'detail-note-text'; nt.textContent = notes[i];
+      sec.appendChild(nt);
+    }
+    panel.appendChild(sec);
   }
 
   // Image
@@ -1155,8 +1207,12 @@ function openModal(y, m, d) {
   document.getElementById('modalDateStr').textContent =
     `${real.getFullYear()}\u5e74${real.getMonth()+1}月${real.getDate()}日（${dow}）`;
 
-  document.getElementById('noteArea').value  = db.notes[editKey] || '';
-  document.getElementById('timeInput').value = db.times[editKey] || '';
+  const entryNotes = getEntryArr(db.notes[editKey]);
+  const entryTimes = getEntryArr(db.times[editKey]);
+  for (let i = 0; i < 3; i++) {
+    document.getElementById('noteArea' + i).value  = entryNotes[i];
+    document.getElementById('timeInput' + i).value = entryTimes[i];
+  }
   modalAct = new Set(db.placements[editKey] || []);
 
   pendingDayImg = db.dayImages[editKey] || null;
@@ -1196,8 +1252,10 @@ document.getElementById('imgRemoveBtn').addEventListener('click', e => {
   pendingDayImg = null; updateImgAttachUI();
 });
 
-document.getElementById('timeClearBtn').addEventListener('click', () => {
-  document.getElementById('timeInput').value = '';
+document.querySelectorAll('.time-clear-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.getElementById('timeInput' + btn.dataset.idx).value = '';
+  });
 });
 
 function renderModalStamps() {
@@ -1221,11 +1279,13 @@ function renderModalStamps() {
 }
 
 document.getElementById('saveBtn').addEventListener('click', () => {
-  const text = document.getElementById('noteArea').value.trim();
-  const time = document.getElementById('timeInput').value;
+  const txts = [0,1,2].map(i => document.getElementById('noteArea' + i).value.trim());
+  const tims = [0,1,2].map(i => document.getElementById('timeInput' + i).value);
+  const anyText = txts.some(t => t);
+  const anyTime = tims.some(t => t);
 
-  if (text) db.notes[editKey] = text; else delete db.notes[editKey];
-  if (time) db.times[editKey] = time; else delete db.times[editKey];
+  if (anyText) db.notes[editKey] = txts; else delete db.notes[editKey];
+  if (anyTime) db.times[editKey] = tims; else delete db.times[editKey];
   if (modalAct.size > 0) db.placements[editKey] = [...modalAct]; else delete db.placements[editKey];
   if (pendingDayImg) db.dayImages[editKey] = pendingDayImg; else delete db.dayImages[editKey];
 
