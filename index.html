@@ -89,7 +89,6 @@
     }
     .today-btn:active { border-color: var(--accent); color: var(--accent); }
 
-    /* Theme button: colored circle */
     .theme-btn {
       width: 30px; height: 30px; border-radius: 50%;
       border: 2px solid var(--border);
@@ -148,7 +147,6 @@
     /* ═══════════════════════ CALENDAR ═══════════════════════ */
     .cal-area { padding: 4px 4px 0; position: relative; z-index: 1; }
 
-    /* SKZ watermark */
     .cal-area::before {
       content: 'SKZ';
       position: fixed; top: 50%; left: 50%;
@@ -186,12 +184,8 @@
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
     }
-    .day-num.s  { color: var(--sun); }
-    .day-num.sa { color: var(--sat); }
-
-    /* Sunday = last column, Saturday = 6th column in Mon-start */
     .day-num.mon-sat { color: var(--sat); }
-    .day-num.mon-sun { color: var(---un); }
+    .day-num.mon-sun { color: var(--sun); }
 
     .stamp-row {
       display: flex; flex-wrap: wrap; gap: 2px; margin-top: 2px;
@@ -216,7 +210,6 @@
       overflow: hidden; line-height: 1.3;
     }
 
-    /* Camera icon badge */
     .img-badge {
       position: absolute; top: 2px; right: 2px;
       font-size: 10px; opacity: 0.7;
@@ -274,6 +267,9 @@
       display: flex; align-items: center; gap: 6px;
     }
     .detail-time-icon { font-size: 14px; }
+    .detail-loc {
+      font-size: 13px; color: var(--text2); margin-top: 4px;
+    }
 
     .detail-note-text {
       font-size: 14px; line-height: 1.7; color: var(--text);
@@ -286,6 +282,7 @@
       border-radius: var(--r); padding: 10px 14px; cursor: pointer;
       -webkit-tap-highlight-color: transparent;
       transition: border-color 0.15s;
+      margin-top: 8px;
     }
     .detail-img-btn:active { border-color: var(--accent); }
     .detail-img-preview {
@@ -351,7 +348,7 @@
       font-size: 10px; color: var(--text2); text-align: center;
       padding: 3px 8px 1px;
       flex-shrink: 0; white-space: nowrap; letter-spacing: 0.5px;
-      position: fixed; bottom: 64px; left: 0; right: 0: z-index: 49;
+      position: fixed; bottom: 64px; left: 0; right: 0; z-index: 49;
       pointer-events: none; background: transparent;
     }
     .hint-bar.stamp-on { color: var(--accent); font-weight: 700; }
@@ -395,9 +392,18 @@
       color: var(--text2); margin-bottom: 7px;
     }
 
+    .entry-num {
+      font-size: 11px; color: var(--accent); font-weight: 700;
+      margin: 10px 0 6px;
+    }
+    .entry-divider {
+      border: none; border-top: 1px dashed var(--border);
+      margin: 16px 0 12px;
+    }
+
     /* Time + Note row */
     .time-note-row {
-      display: flex; gap: 10px; margin-bottom: 14px;
+      display: flex; gap: 10px; margin-bottom: 6px;
     }
     .time-wrap {
       flex-shrink: 0; display: flex; flex-direction: column;
@@ -430,30 +436,41 @@
     }
     .note-area:focus { outline: none; border-color: var(--accent); }
 
-    /* Image attach section */
-    .img-attach-area {
+    /* Location input */
+    .loc-input {
+      width: 100%; height: 40px;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: var(--r); color: var(--text);
+      font-size: 14px; font-family: inherit;
+      padding: 0 12px; margin-bottom: 6px;
+      transition: border-color 0.15s, background 0.3s;
+    }
+    .loc-input:focus { outline: none; border-color: var(--accent); }
+    .loc-input::placeholder { color: var(--text2); }
+
+    /* Per-entry compact photo attach */
+    .img-attach-sm {
       background: var(--bg3); border: 1px dashed var(--border);
-      border-radius: var(--r); padding: 12px;
-      margin-bottom: 14px; cursor: pointer;
-      display: flex; align-items: center; gap: 12px;
+      border-radius: var(--r); padding: 8px 12px;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 10px;
       -webkit-tap-highlight-color: transparent;
       transition: border-color 0.15s, background 0.3s;
     }
-    .img-attach-area:active { border-color: var(--accent); }
-    .img-attach-area.has-img { border-style: solid; border-color: rgba(128,128,0,0.4); }
-
-    .img-attach-thumb {
-      width: 56px; height: 56px; border-radius: 6px; overflow: hidden;
+    .img-attach-sm:active { border-color: var(--accent); }
+    .img-attach-sm.has-img { border-style: solid; border-color: rgba(128,100,0,0.4); }
+    .img-sm-thumb {
+      width: 40px; height: 40px; border-radius: 6px; overflow: hidden;
       flex-shrink: 0; background: var(--bg2);
-      display: flex; align-items: center; justify-content: center; font-size: 24px;
+      display: flex; align-items: center; justify-content: center; font-size: 18px;
     }
-    .img-attach-thumb img { width: 100%; height: 100%; object-fit: cover; }
-    .img-attach-info { flex: 1; }
-    .img-attach-label { font-size: 13px; color: var(--text); font-weight: 600; }
-    .img-attach-sub   { font-size: 10px; color: var(--text2); margin-top: 2px; }
-    .img-remove-btn {
+    .img-sm-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .img-sm-info { flex: 1; }
+    .img-sm-label { font-size: 12px; color: var(--text); font-weight: 600; }
+    .img-sm-sub   { font-size: 10px; color: var(--text2); margin-top: 2px; }
+    .img-remove-sm {
       background: none; border: 1px solid var(--border);
-      color: var(--sun); font-size: 11px; padding: 5px 10px;
+      color: var(--sun); font-size: 10px; padding: 4px 8px;
       border-radius: var(--r); cursor: pointer; flex-shrink: 0;
       -webkit-tap-highlight-color: transparent;
     }
@@ -479,11 +496,6 @@
     }
     .m-thumb img { width: 100%; height: 100%; object-fit: cover; }
     .m-name { font-size: 8px; color: var(--text2); text-align: center; line-height: 1.3; }
-
-    .entry-num {
-      font-size: 11px; color: var(--accent); font-weight: 700;
-      margin: 10px 0 4px;
-    }
 
     .clear-btn {
       width: 100%; background: transparent; color: var(--text2);
@@ -520,9 +532,18 @@
       background: none; border: 1px solid var(--border); color: var(--text);
       padding: 8px 14px; border-radius: var(--r); font-size: 13px; cursor: pointer;
       -webkit-tap-highlight-color: transparent; transition: border-color 0.2s;
+      flex-shrink: 0;
     }
     .back-btn:active { border-color: var(--accent); color: var(--accent); }
-    .mgr-title { font-size: 16px; font-weight: 900; letter-spacing: 3px; color: var(--accent); }
+    .mgr-title { font-size: 16px; font-weight: 900; letter-spacing: 3px; color: var(--accent); flex: 1; }
+    .sort-btn {
+      background: none; border: 1px solid var(--border); color: var(--text2);
+      font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+      padding: 7px 12px; border-radius: var(--r); cursor: pointer;
+      -webkit-tap-highlight-color: transparent; transition: border-color 0.2s, color 0.2s;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .sort-btn:active { border-color: var(--accent); color: var(--accent); }
 
     .mgr-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px 14px; }
 
@@ -550,6 +571,52 @@
     .slot-thumb img { width: 100%; height: 100%; object-fit: cover; }
     .slot-name { font-size: 11px; font-weight: 600; text-align: center; line-height: 1.3; }
     .slot-action { font-size: 10px; color: var(--accent); text-align: center; }
+
+    /* ═══════════════════════ SORT PANEL ═══════════════════════ */
+    .sort-panel {
+      position: fixed; inset: 0; z-index: 400;
+      background: var(--bg); display: flex; flex-direction: column;
+    }
+    .sort-panel.hide { display: none; }
+    .sort-hdr {
+      background: var(--bg2); border-bottom: 1.5px solid var(--border);
+      padding: 13px 14px; display: flex; align-items: center; gap: 12px;
+      flex-shrink: 0;
+    }
+    .sort-title { font-size: 15px; font-weight: 900; letter-spacing: 2px; color: var(--accent); flex: 1; }
+    .sort-done-btn {
+      background: var(--accent); color: var(--actext); border: none;
+      font-size: 13px; font-weight: 800; padding: 8px 18px;
+      border-radius: var(--r); cursor: pointer; flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .sort-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 14px; }
+    .sort-hint { font-size: 11px; color: var(--text2); margin-bottom: 16px; text-align: center; letter-spacing: 0.5px; }
+    .sort-list { display: flex; flex-direction: column; gap: 8px; }
+    .sort-item {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 12px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .sort-thumb {
+      width: 42px; height: 42px; border-radius: 8px; overflow: hidden;
+      background: var(--bg3); display: flex; align-items: center; justify-content: center;
+      font-size: 24px; flex-shrink: 0;
+    }
+    .sort-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .sort-info { flex: 1; }
+    .sort-name { font-size: 13px; font-weight: 600; }
+    .sort-cat-lbl { font-size: 9px; color: var(--text2); letter-spacing: 1px; margin-top: 2px; }
+    .sort-arrows { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+    .sort-arrow-btn {
+      width: 32px; height: 28px; background: var(--bg3);
+      border: 1px solid var(--border); border-radius: 5px;
+      color: var(--text); font-size: 14px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .sort-arrow-btn:active { border-color: var(--accent); color: var(--accent); }
+    .sort-arrow-btn:disabled { opacity: 0.2; pointer-events: none; }
 
     /* ═══════════════════════ IMAGE VIEWER ═══════════════════════ */
     .img-viewer {
@@ -633,7 +700,7 @@
       <button class="close-btn" id="closeModal">✕</button>
     </div>
 
-    <div class="sec-lbl">時間・メモ</div>
+    <!-- Entry ① -->
     <div class="entry-num">①</div>
     <div class="time-note-row">
       <div class="time-wrap">
@@ -644,6 +711,19 @@
         <textarea class="note-area" id="noteArea0" placeholder="予定①..."></textarea>
       </div>
     </div>
+    <input type="text" class="loc-input" id="locInput0" placeholder="📍 場所（例：東京ドーム）">
+    <div class="img-attach-sm" id="imgAttachSm0">
+      <div class="img-sm-thumb" id="imgSmThumb0">📷</div>
+      <div class="img-sm-info">
+        <div class="img-sm-label" id="imgSmLabel0">写真①を添付</div>
+        <div class="img-sm-sub">タップして選択</div>
+      </div>
+      <button class="img-remove-sm hide" id="imgRemoveSm0">削除</button>
+    </div>
+
+    <hr class="entry-divider">
+
+    <!-- Entry ② -->
     <div class="entry-num">②</div>
     <div class="time-note-row">
       <div class="time-wrap">
@@ -654,6 +734,19 @@
         <textarea class="note-area" id="noteArea1" placeholder="予定②..."></textarea>
       </div>
     </div>
+    <input type="text" class="loc-input" id="locInput1" placeholder="📍 場所（例：東京ドーム）">
+    <div class="img-attach-sm" id="imgAttachSm1">
+      <div class="img-sm-thumb" id="imgSmThumb1">📷</div>
+      <div class="img-sm-info">
+        <div class="img-sm-label" id="imgSmLabel1">写真②を添付</div>
+        <div class="img-sm-sub">タップして選択</div>
+      </div>
+      <button class="img-remove-sm hide" id="imgRemoveSm1">削除</button>
+    </div>
+
+    <hr class="entry-divider">
+
+    <!-- Entry ③ -->
     <div class="entry-num">③</div>
     <div class="time-note-row">
       <div class="time-wrap">
@@ -664,18 +757,17 @@
         <textarea class="note-area" id="noteArea2" placeholder="予定③..."></textarea>
       </div>
     </div>
-
-    <div class="sec-lbl">📷 写真</div>
-    <div class="img-attach-area" id="imgAttachArea">
-      <div class="img-attach-thumb" id="imgAttachThumb">📷</div>
-      <div class="img-attach-info">
-        <div class="img-attach-label" id="imgAttachLabel">写真を添付する</div>
-        <div class="img-attach-sub">タップして選択（表示はタップ時のみ）</div>
+    <input type="text" class="loc-input" id="locInput2" placeholder="📍 場所（例：東京ドーム）">
+    <div class="img-attach-sm" id="imgAttachSm2">
+      <div class="img-sm-thumb" id="imgSmThumb2">📷</div>
+      <div class="img-sm-info">
+        <div class="img-sm-label" id="imgSmLabel2">写真③を添付</div>
+        <div class="img-sm-sub">タップして選択</div>
       </div>
-      <button class="img-remove-btn hide" id="imgRemoveBtn">削除</button>
+      <button class="img-remove-sm hide" id="imgRemoveSm2">削除</button>
     </div>
 
-    <div class="sec-lbl">スタンプ</div>
+    <div class="sec-lbl" style="margin-top:16px;">スタンプ</div>
     <div class="modal-stamps-grid" id="modalStampsGrid"></div>
     <button class="clear-btn" id="clearBtn">この日をクリア</button>
     <button class="save-btn" id="saveBtn">SAVE</button>
@@ -687,8 +779,22 @@
   <div class="mgr-hdr">
     <button class="back-btn" id="backBtn">← 戻る</button>
     <div class="mgr-title">STAMP MANAGER</div>
+    <button class="sort-btn" id="sortBtn">🔀 並べ替え</button>
   </div>
   <div class="mgr-body" id="mgrBody"></div>
+</div>
+
+<!-- ══════════ SORT PANEL ══════════ -->
+<div class="sort-panel hide" id="sortPanel">
+  <div class="sort-hdr">
+    <button class="back-btn" id="sortBackBtn">← 戻る</button>
+    <div class="sort-title">STAMP ORDER</div>
+    <button class="sort-done-btn" id="sortDoneBtn">完了</button>
+  </div>
+  <div class="sort-body">
+    <div class="sort-hint">↑↓ ボタンで並べ替え（パレットや編集画面に反映されます）</div>
+    <div class="sort-list" id="sortList"></div>
+  </div>
 </div>
 
 <!-- ══════════ IMAGE VIEWER ══════════ -->
@@ -778,7 +884,6 @@ function applyTheme(key) {
   r.setProperty('--pat',    t.pat);
   r.setProperty('--wm',     t.wm);
   document.getElementById('themeBtn').style.background = t.swatch;
-  // Update active swatch
   document.querySelectorAll('.swatch-circle').forEach(el => {
     el.classList.toggle('active', el.dataset.key === key);
   });
@@ -812,28 +917,30 @@ document.addEventListener('click', e => {
 });
 
 // ═══════════════════════════════════════════════════════
-// STAMPS  (18 total)
+// STAMPS  (21 total)
 // ═══════════════════════════════════════════════════════
 const STAMPS = [
-  { id:'bc', name:'Bang Chan',  cat:'member',   emoji:'🐺' },
-  { id:'ln', name:'Lee Know',   cat:'member',   emoji:'🐱' },
-  { id:'cb', name:'Changbin',   cat:'member',   emoji:'🐸' },
-  { id:'hj', name:'Hyunjin',    cat:'member',   emoji:'🦋' },
-  { id:'hn', name:'Han',        cat:'member',   emoji:'🐹' },
-  { id:'fl', name:'Felix',      cat:'member',   emoji:'🐰' },
-  { id:'sm', name:'Seungmin',   cat:'member',   emoji:'🐶' },
-  { id:'in', name:'I.N',        cat:'member',   emoji:'🦊' },
-  { id:'kr', name:'韓国',        cat:'location', emoji:'🇰🇷' },
-  { id:'jp', name:'日本',        cat:'location', emoji:'🇯🇵' },
-  { id:'cd', name:'カムバ',      cat:'event',    emoji:'💿' },
-  { id:'lv', name:'ライブ',      cat:'event',    emoji:'🎤' },
-  { id:'pm', name:'ペンミ',      cat:'event',    emoji:'🎪' },
-  { id:'bd', name:'誕生日',      cat:'event',    emoji:'🎂' },
-  { id:'tv', name:'テレビ',      cat:'event',    emoji:'📺' },
-  { id:'rd', name:'ラジオ',      cat:'event',    emoji:'📻' },
-  { id:'dp', name:'出国',        cat:'event',    emoji:'🛫' },
-  { id:'rt', name:'帰国',        cat:'event',    emoji:'🛬' },
-  { id:'mg', name:'megu',        cat:'myself',   emoji:'🌸' },
+  { id:'bc', name:'Bang Chan',  cat:'member',   emoji:'\uD83D\uDC3A' },
+  { id:'ln', name:'Lee Know',   cat:'member',   emoji:'\uD83D\uDC31' },
+  { id:'cb', name:'Changbin',   cat:'member',   emoji:'\uD83D\uDC38' },
+  { id:'hj', name:'Hyunjin',    cat:'member',   emoji:'\uD83E\uDD8B' },
+  { id:'hn', name:'Han',        cat:'member',   emoji:'\uD83D\uDC39' },
+  { id:'fl', name:'Felix',      cat:'member',   emoji:'\uD83D\uDC30' },
+  { id:'sm', name:'Seungmin',   cat:'member',   emoji:'\uD83D\uDC36' },
+  { id:'in', name:'I.N',        cat:'member',   emoji:'\uD83E\uDD8A' },
+  { id:'kr', name:'\u97D3\u56FD',        cat:'location', emoji:'\uD83C\uDDF0\uD83C\uDDF7' },
+  { id:'jp', name:'\u65E5\u672C',        cat:'location', emoji:'\uD83C\uDDEF\uD83C\uDDF5' },
+  { id:'cd', name:'\u30AB\u30E0\u30D0',      cat:'event',    emoji:'\uD83D\uDCC0' },
+  { id:'lv', name:'\u30E9\u30A4\u30D6',      cat:'event',    emoji:'\uD83C\uDFA4' },
+  { id:'pm', name:'\u30DA\u30F3\u30DF',      cat:'event',    emoji:'\uD83C\uDFAA' },
+  { id:'aw', name:'\u30A2\u30EF\u30FC\u30C9',     cat:'event',    emoji:'\uD83C\uDFC6' },
+  { id:'fs', name:'\u30D5\u30A7\u30B9',       cat:'event',    emoji:'\uD83C\uDF89' },
+  { id:'bd', name:'\u8A95\u751F\u65E5',      cat:'event',    emoji:'\uD83C\uDF82' },
+  { id:'tv', name:'\u30C6\u30EC\u30D3',      cat:'event',    emoji:'\uD83D\uDCFA' },
+  { id:'rd', name:'\u30E9\u30B8\u30AA',      cat:'event',    emoji:'\uD83D\uDCFB' },
+  { id:'dp', name:'\u51FA\u56FD',        cat:'event',    emoji:'\uD83D\uDEEB' },
+  { id:'rt', name:'\u5E30\u56FD',        cat:'event',    emoji:'\uD83D\uDEEC' },
+  { id:'mg', name:'megu',        cat:'myself',   emoji:'\uD83C\uDF38' },
 ];
 
 const CATS = [
@@ -843,9 +950,10 @@ const CATS = [
   { key:'myself',   label:'MYSELF'   },
 ];
 
-const DOW_MON = ['月','火','水','木','金','土','日'];
-const DOW_JP  = ['日','月','火','水','木','金','土'];
-const JM = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+const DOW_MON = ['\u6708','\u706B','\u6C34','\u6728','\u91D1','\u571F','\u65E5'];
+const DOW_JP  = ['\u65E5','\u6708','\u706B','\u6C34','\u6728','\u91D1','\u571F'];
+const JM = ['1\u6708','2\u6708','3\u6708','4\u6708','5\u6708','6\u6708','7\u6708','8\u6708','9\u6708','10\u6708','11\u6708','12\u6708'];
+const ENTRY_NUMS = ['\u2460', '\u2461', '\u2462'];
 
 // ═══════════════════════════════════════════════════════
 // STATE & STORAGE
@@ -853,9 +961,9 @@ const JM = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10�
 let curY = new Date().getFullYear();
 let curM = new Date().getMonth();
 let selStamp  = null;
-let selKey    = null;  // currently selected date key
+let selKey    = null;
 
-let db = { notes:{}, times:{}, placements:{}, images:{}, dayImages:{} };
+let db = { notes:{}, times:{}, locs:{}, placements:{}, images:{}, dayImages:{}, stampOrder:[] };
 
 function dk(y,m,d) { return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
 
@@ -863,19 +971,43 @@ function loadDB() {
   try {
     const raw = localStorage.getItem('skzSched_v3');
     if (raw) { const p = JSON.parse(raw); Object.assign(db, p); }
+    if (!db.locs)       db.locs = {};
+    if (!db.stampOrder) db.stampOrder = [];
   } catch(e) {}
 }
 
 function saveDB() {
   try { localStorage.setItem('skzSched_v3', JSON.stringify(db)); }
-  catch(e) { alert('⚠️ 保存できませんでした。\nストレージの空き容量が不足しています。\n古い写真の添付を削除してください。'); }
+  catch(e) { alert('\u26A0\uFE0F \u4FDD\u5B58\u3067\u304D\u307E\u305B\u3093\u3067\u3057\u305F\u3002\n\u30B9\u30C8\u30EC\u30FC\u30B8\u306E\u7A7A\u304D\u5BB9\u91CF\u304C\u4E0D\u8DB3\u3057\u3066\u3044\u307E\u3059\u3002\n\u53E4\u3044\u5199\u771F\u306E\u6DFB\u4ED8\u3092\u524A\u9664\u3057\u3066\u304F\u3060\u3055\u3044\u3002'); }
 }
 
-// 旧形式（文字列）→新形式（配列）対応ヘルパー
+// ─── Backward-compat helpers ───────────────────────────
 function getEntryArr(v) {
   if (!v) return ['', '', ''];
   if (Array.isArray(v)) { const a = v.slice(0,3); while (a.length < 3) a.push(''); return a; }
   return [v, '', ''];
+}
+
+function getLocArr(v) {
+  if (!v) return ['', '', ''];
+  if (Array.isArray(v)) { const a = v.slice(0,3); while (a.length < 3) a.push(''); return a; }
+  return [v, '', ''];
+}
+
+function getImgArr(v) {
+  if (!v) return [null, null, null];
+  if (Array.isArray(v)) { const a = v.slice(0,3); while (a.length < 3) a.push(null); return a; }
+  return [v, null, null]; // old single-string → first entry
+}
+
+// ─── Stamp order ──────────────────────────────────────
+function getOrderedStamps() {
+  const order = db.stampOrder || [];
+  const allIds = STAMPS.map(s => s.id);
+  // Existing order, filtered to valid IDs, plus any new IDs appended
+  const valid   = order.filter(id => allIds.includes(id));
+  const missing = allIds.filter(id => !valid.includes(id));
+  return [...valid, ...missing].map(id => STAMPS.find(s => s.id === id)).filter(Boolean);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -891,8 +1023,7 @@ function compress(file, maxPx, quality) {
         const c = document.createElement('canvas');
         c.width  = Math.round(img.width  * r);
         c.height = Math.round(img.height * r);
-        const ctx = c.getContext('2d');
-        ctx.drawImage(img, 0, 0, c.width, c.height);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
         const hasAlpha = file.type === 'image/png' || file.type === 'image/gif' || file.type === 'image/webp';
         res(c.toDataURL(hasAlpha ? 'image/png' : 'image/jpeg', quality));
       };
@@ -929,10 +1060,10 @@ function updateHint() {
   const bar = document.getElementById('hintBar');
   if (selStamp) {
     const def = STAMPS.find(s => s.id === selStamp);
-    bar.textContent = `${def?.emoji} ${def?.name} 選択中 ─ 日付をタップして貼り付け／もう一度タップで解除`;
+    bar.textContent = `${def?.emoji} ${def?.name} \u9078\u629E\u4E2D \u2015 \u65E5\u4ED8\u3092\u30BF\u30C3\u30D7\u3057\u3066\u8CBC\u308A\u4ED8\u3051\uFF0F\u3082\u3046\u4E00\u5EA6\u30BF\u30C3\u30D7\u3067\u89E3\u9664`;
     bar.classList.add('stamp-on');
   } else {
-    bar.textContent = '✍️ 日付をタップして編集 ／ 下のスタンプを選んで日付に貼り付け';
+    bar.textContent = '\u270D\uFE0F \u65E5\u4ED8\u3092\u30BF\u30C3\u30D7\u3057\u3066\u7DE8\u96C6 \uFF0F \u4E0B\u306E\u30B9\u30BF\u30F3\u30D7\u3092\u9078\u3093\u3067\u65E5\u4ED8\u306B\u8CBC\u308A\u4ED8\u3051';
     bar.classList.remove('stamp-on');
   }
 }
@@ -941,13 +1072,12 @@ function updateHint() {
 // CALENDAR
 // ═══════════════════════════════════════════════════════
 function renderCalendar() {
-  document.getElementById('monthDisp').textContent = `${curY}年${JM[curM]}`;
+  document.getElementById('monthDisp').textContent = `${curY}\u5e74${JM[curM]}`;
   const grid = document.getElementById('calGrid');
   grid.innerHTML = '';
 
-  // Monday-start: shift getDay() so Mon=0 … Sun=6
   const firstDowRaw  = new Date(curY, curM, 1).getDay();
-  const firstDow     = (firstDowRaw + 6) % 7;  // Mon-based
+  const firstDow     = (firstDowRaw + 6) % 7;
   const daysInMo     = new Date(curY, curM + 1, 0).getDate();
   const daysInPrev   = new Date(curY, curM, 0).getDate();
 
@@ -969,36 +1099,35 @@ function makeCell(y, m, d, other, todayKey) {
   const real = new Date(y, m, d);
   const ry = real.getFullYear(), rm = real.getMonth(), rd = real.getDate();
   const key  = dk(ry, rm, rd);
-  const dow  = real.getDay(); // 0=Sun…6=Sat
-  const monDow = (dow + 6) % 7; // Mon-based col 0–6
+  const dow  = real.getDay();
+  const monDow = (dow + 6) % 7;
 
   const places = db.placements[key] || [];
   const notes  = getEntryArr(db.notes[key]);
   const times  = getEntryArr(db.times[key]);
-  const note   = notes[0];
-  const time   = times[0];
+  const locs   = getLocArr(db.locs[key]);
+  const imgs   = getImgArr(db.dayImages[key]);
 
   const cell = document.createElement('div');
   let cls = 'day';
-  if (other)                     cls += ' other';
-  if (key === todayKey)          cls += ' today';
-  if (key === selKey)            cls += ' selected';
-  if (places.length || notes.some(n=>n) || times.some(t=>t) || db.dayImages[key]) cls += ' has-data';
+  if (other)          cls += ' other';
+  if (key === todayKey) cls += ' today';
+  if (key === selKey) cls += ' selected';
+  if (places.length || notes.some(n=>n) || times.some(t=>t) || locs.some(l=>l) || imgs.some(img=>img)) cls += ' has-data';
   cell.className = cls;
 
-  // Day number
   const numEl = document.createElement('div');
   let numCls = 'day-num';
-  if (monDow === 5) numCls += ' mon-sat';  // Sat col
-  if (monDow === 6) numCls += ' mon-sun';  // Sun col
+  if (monDow === 5) numCls += ' mon-sat';
+  if (monDow === 6) numCls += ' mon-sun';
   numEl.className = numCls;
   numEl.textContent = rd;
   cell.appendChild(numEl);
 
-  // Camera badge
-  if (db.dayImages[key]) {
+  // Camera badge (any of 3 photos)
+  if (imgs.some(img => img)) {
     const badge = document.createElement('div');
-    badge.className = 'img-badge'; badge.textContent = '📷';
+    badge.className = 'img-badge'; badge.textContent = '\uD83D\uDCF7';
     cell.appendChild(badge);
   }
 
@@ -1018,30 +1147,29 @@ function makeCell(y, m, d, other, todayKey) {
     cell.appendChild(row);
   }
 
-  // Time
-  if (time) {
+  // Time (first entry)
+  if (times[0]) {
     const te = document.createElement('div');
-    te.className = 'day-time-preview'; te.textContent = '⏰' + time;
+    te.className = 'day-time-preview'; te.textContent = '\u23F0' + times[0];
     cell.appendChild(te);
   }
 
   // Note (first entry)
-  if (note) {
+  if (notes[0]) {
     const ne = document.createElement('div');
-    ne.className = 'day-note-preview'; ne.textContent = note.substring(0, 28);
+    ne.className = 'day-note-preview'; ne.textContent = notes[0].substring(0, 28);
     cell.appendChild(ne);
   }
 
-  // Show "+N件" if there are additional entries
-  const extraCount = [1,2].filter(i => notes[i] || times[i]).length;
+  // Show "+N件" for additional entries
+  const extraCount = [1,2].filter(i => notes[i] || times[i] || locs[i] || imgs[i]).length;
   if (extraCount > 0) {
     const ex = document.createElement('div');
     ex.className = 'day-note-preview';
-    ex.style.color = 'var(--text2)'; ex.textContent = '+' + extraCount + '件';
+    ex.style.color = 'var(--text2)'; ex.textContent = '+' + extraCount + '\u4EF6';
     cell.appendChild(ex);
   }
 
-  // Click
   cell.addEventListener('click', () => {
     if (selStamp) {
       const arr = [...(db.placements[key] || [])];
@@ -1065,20 +1193,21 @@ function makeCell(y, m, d, other, todayKey) {
 function renderDetail() {
   const panel = document.getElementById('detailPanel');
   if (!selKey) {
-    panel.innerHTML = '<div class="detail-empty">← 日付をタップすると詳細が表示されます</div>';
+    panel.innerHTML = '<div class="detail-empty">\u2190 \u65E5\u4ED8\u3092\u30BF\u30C3\u30D7\u3059\u308B\u3068\u8A73\u7D30\u304C\u8868\u793A\u3055\u308C\u307E\u3059</div>';
     return;
   }
 
   const [sy, sm, sd] = selKey.split('-').map(Number);
   const real = new Date(sy, sm - 1, sd);
   const dow  = DOW_JP[real.getDay()];
-  const dateStr = `${sy}\u5e74${sm}月${sd}日（${dow}）`;
+  const dateStr = `${sy}\u5e74${sm}\u6708${sd}\u65E5\uFF08${dow}\uFF09`;
 
   const places  = db.placements[selKey] || [];
   const notes   = getEntryArr(db.notes[selKey]);
   const times   = getEntryArr(db.times[selKey]);
-  const dayImg  = db.dayImages[selKey] || '';
-  const hasMultiEntry = [1,2].some(i => notes[i] || times[i]);
+  const locs    = getLocArr(db.locs[selKey]);
+  const imgs    = getImgArr(db.dayImages[selKey]);
+  const hasMultiEntry = [1,2].some(i => notes[i] || times[i] || locs[i] || imgs[i]);
 
   panel.innerHTML = '';
 
@@ -1087,15 +1216,14 @@ function renderDetail() {
   top.className = 'detail-top';
   top.innerHTML = `<div class="detail-date-str">${dateStr}</div>`;
   const editBtn = document.createElement('button');
-  editBtn.className = 'detail-edit-btn'; editBtn.textContent = '編集';
+  editBtn.className = 'detail-edit-btn'; editBtn.textContent = '\u7DE8\u96C6';
   editBtn.addEventListener('click', () => openModal(sy, sm - 1, sd));
   top.appendChild(editBtn);
   panel.appendChild(top);
 
   // Stamps
   if (places.length > 0) {
-    const sec = document.createElement('div');
-    sec.className = 'detail-section';
+    const sec = document.createElement('div'); sec.className = 'detail-section';
     const lbl = document.createElement('div'); lbl.className = 'detail-lbl'; lbl.textContent = 'STAMPS';
     sec.appendChild(lbl);
     const row = document.createElement('div'); row.className = 'detail-stamps-row';
@@ -1114,50 +1242,51 @@ function renderDetail() {
     sec.appendChild(row); panel.appendChild(sec);
   }
 
-  // Time & Note (up to 3 entries)
-  const entryNums = ['①', '②', '③'];
+  // Time / Loc / Note / Photo (up to 3 entries)
   for (let i = 0; i < 3; i++) {
-    if (!times[i] && !notes[i]) continue;
+    if (!times[i] && !notes[i] && !locs[i] && !imgs[i]) continue;
     const sec = document.createElement('div'); sec.className = 'detail-section';
     if (hasMultiEntry) {
       const numLbl = document.createElement('div'); numLbl.className = 'detail-lbl';
-      numLbl.textContent = entryNums[i]; sec.appendChild(numLbl);
+      numLbl.textContent = ENTRY_NUMS[i];
+      sec.appendChild(numLbl);
     } else {
       const lbl = document.createElement('div'); lbl.className = 'detail-lbl'; lbl.textContent = 'SCHEDULE';
       sec.appendChild(lbl);
     }
     if (times[i]) {
       const tv = document.createElement('div'); tv.className = 'detail-time';
-      tv.innerHTML = `<span class="detail-time-icon">⏰</span><span>${times[i]}</span>`;
+      tv.innerHTML = `<span class="detail-time-icon">\u23F0</span><span>${times[i]}</span>`;
       sec.appendChild(tv);
+    }
+    if (locs[i]) {
+      const lv = document.createElement('div'); lv.className = 'detail-loc';
+      lv.textContent = '\uD83D\uDCCD ' + locs[i];
+      sec.appendChild(lv);
     }
     if (notes[i]) {
       const nt = document.createElement('div'); nt.className = 'detail-note-text'; nt.textContent = notes[i];
       sec.appendChild(nt);
     }
+    if (imgs[i]) {
+      const btn = document.createElement('div'); btn.className = 'detail-img-btn';
+      btn.innerHTML = `
+        <div class="detail-img-preview"><img src="${imgs[i]}" alt="photo"></div>
+        <div>
+          <div class="detail-img-label">\u5199\u771F${ENTRY_NUMS[i]}\u3092\u898B\u308B</div>
+          <div class="detail-img-sub">\u30BF\u30C3\u30D7\u3057\u3066\u62E1\u5927\u8868\u793A</div>
+        </div>`;
+      btn.addEventListener('click', () => openViewer(imgs[i]));
+      sec.appendChild(btn);
+    }
     panel.appendChild(sec);
   }
 
-  // Image
-  if (dayImg) {
-    const sec = document.createElement('div'); sec.className = 'detail-section';
-    const lbl = document.createElement('div'); lbl.className = 'detail-lbl'; lbl.textContent = 'PHOTO';
-    const btn = document.createElement('div'); btn.className = 'detail-img-btn';
-    btn.innerHTML = `
-      <div class="detail-img-preview"><img src="${dayImg}" alt="photo"></div>
-      <div>
-        <div class="detail-img-label">写真を見る</div>
-        <div class="detail-img-sub">タップして拡大表示</div>
-      </div>`;
-    btn.addEventListener('click', () => openViewer(dayImg));
-    sec.appendChild(lbl); sec.appendChild(btn); panel.appendChild(sec);
-  }
-
   // Empty state
-  if (!places.length && !note && !time && !dayImg) {
+  if (!places.length && !notes.some(n=>n) && !times.some(t=>t) && !locs.some(l=>l) && !imgs.some(img=>img)) {
     const empty = document.createElement('div');
     empty.className = 'detail-empty';
-    empty.textContent = '「編集」をタップしてスケジュールを追加';
+    empty.textContent = '\u300C\u7DE8\u96C6\u300D\u3092\u30BF\u30C3\u30D7\u3057\u3066\u30B9\u30B1\u30B8\u30E5\u30FC\u30EB\u3092\u8FFD\u52A0';
     panel.appendChild(empty);
   }
 }
@@ -1168,7 +1297,7 @@ function renderDetail() {
 function renderPalette() {
   const area = document.getElementById('palArea');
   area.innerHTML = '';
-  STAMPS.forEach(def => {
+  getOrderedStamps().forEach(def => {
     const el = document.createElement('div');
     el.className = 'p-stamp' + (selStamp === def.id ? ' sel' : '');
     if (db.images[def.id]) {
@@ -1195,9 +1324,10 @@ document.getElementById('textModeBtn').addEventListener('click', () => {
 // ═══════════════════════════════════════════════════════
 // DAY MODAL
 // ═══════════════════════════════════════════════════════
-let editKey   = null;
-let modalAct  = new Set();
-let pendingDayImg = null;  // base64 staged but not saved yet
+let editKey       = null;
+let modalAct      = new Set();
+let pendingDayImgs = [null, null, null];
+let imgUploadIdx  = 0;
 
 function openModal(y, m, d) {
   const real = new Date(y, m, d);
@@ -1205,18 +1335,21 @@ function openModal(y, m, d) {
 
   const dow = DOW_JP[real.getDay()];
   document.getElementById('modalDateStr').textContent =
-    `${real.getFullYear()}\u5e74${real.getMonth()+1}月${real.getDate()}日（${dow}）`;
+    `${real.getFullYear()}\u5e74${real.getMonth()+1}\u6708${real.getDate()}\u65E5\uFF08${dow}\uFF09`;
 
   const entryNotes = getEntryArr(db.notes[editKey]);
   const entryTimes = getEntryArr(db.times[editKey]);
+  const entryLocs  = getLocArr(db.locs[editKey]);
   for (let i = 0; i < 3; i++) {
-    document.getElementById('noteArea' + i).value  = entryNotes[i];
+    document.getElementById('noteArea'  + i).value = entryNotes[i];
     document.getElementById('timeInput' + i).value = entryTimes[i];
+    document.getElementById('locInput'  + i).value = entryLocs[i];
   }
-  modalAct = new Set(db.placements[editKey] || []);
 
-  pendingDayImg = db.dayImages[editKey] || null;
-  updateImgAttachUI();
+  pendingDayImgs = getImgArr(db.dayImages[editKey]);
+  for (let i = 0; i < 3; i++) updateImgSmUI(i);
+
+  modalAct = new Set(db.placements[editKey] || []);
   renderModalStamps();
   document.getElementById('dayOverlay').classList.remove('hide');
 }
@@ -1225,32 +1358,39 @@ function closeDayOverlay() {
   document.getElementById('dayOverlay').classList.add('hide');
 }
 
-function updateImgAttachUI() {
-  const area  = document.getElementById('imgAttachArea');
-  const thumb = document.getElementById('imgAttachThumb');
-  const label = document.getElementById('imgAttachLabel');
-  const remBtn = document.getElementById('imgRemoveBtn');
-  if (pendingDayImg) {
+function updateImgSmUI(i) {
+  const area  = document.getElementById('imgAttachSm' + i);
+  const thumb = document.getElementById('imgSmThumb' + i);
+  const label = document.getElementById('imgSmLabel' + i);
+  const remBtn = document.getElementById('imgRemoveSm' + i);
+  if (pendingDayImgs[i]) {
     area.classList.add('has-img');
-    thumb.innerHTML = `<img src="${pendingDayImg}" alt="preview" style="width:100%;height:100%;object-fit:cover;border-radius:4px;">`;
-    label.textContent = '写真あり（タップして変更）';
+    thumb.innerHTML = `<img src="${pendingDayImgs[i]}" alt="preview" style="width:100%;height:100%;object-fit:cover;border-radius:4px;">`;
+    label.textContent = `\u5199\u771F${ENTRY_NUMS[i]}\u3042\u308A\uFF08\u30BF\u30C3\u30D7\u3057\u3066\u5909\u66F4\uFF09`;
     remBtn.classList.remove('hide');
   } else {
     area.classList.remove('has-img');
-    thumb.innerHTML = '📷';
-    label.textContent = '写真を添付する';
+    thumb.innerHTML = '\uD83D\uDCF7';
+    label.textContent = `\u5199\u771F${ENTRY_NUMS[i]}\u3092\u6DFB\u4ED8`;
     remBtn.classList.add('hide');
   }
 }
 
-document.getElementById('imgAttachArea').addEventListener('click', e => {
-  if (e.target.closest('#imgRemoveBtn')) return;
-  document.getElementById('dayImgIn').click();
-});
-document.getElementById('imgRemoveBtn').addEventListener('click', e => {
-  e.stopPropagation();
-  pendingDayImg = null; updateImgAttachUI();
-});
+// Per-entry photo attach events
+for (let i = 0; i < 3; i++) {
+  (function(idx) {
+    document.getElementById('imgAttachSm' + idx).addEventListener('click', e => {
+      if (e.target.closest('.img-remove-sm')) return;
+      imgUploadIdx = idx;
+      document.getElementById('dayImgIn').click();
+    });
+    document.getElementById('imgRemoveSm' + idx).addEventListener('click', e => {
+      e.stopPropagation();
+      pendingDayImgs[idx] = null;
+      updateImgSmUI(idx);
+    });
+  })(i);
+}
 
 document.querySelectorAll('.time-clear-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -1261,7 +1401,7 @@ document.querySelectorAll('.time-clear-btn').forEach(btn => {
 function renderModalStamps() {
   const grid = document.getElementById('modalStampsGrid');
   grid.innerHTML = '';
-  STAMPS.forEach(def => {
+  getOrderedStamps().forEach(def => {
     const item = document.createElement('div');
     item.className = 'm-stamp' + (modalAct.has(def.id) ? ' on' : '');
     const th = document.createElement('div'); th.className = 'm-thumb';
@@ -1279,15 +1419,16 @@ function renderModalStamps() {
 }
 
 document.getElementById('saveBtn').addEventListener('click', () => {
-  const txts = [0,1,2].map(i => document.getElementById('noteArea' + i).value.trim());
+  const txts = [0,1,2].map(i => document.getElementById('noteArea'  + i).value.trim());
   const tims = [0,1,2].map(i => document.getElementById('timeInput' + i).value);
-  const anyText = txts.some(t => t);
-  const anyTime = tims.some(t => t);
+  const locs = [0,1,2].map(i => document.getElementById('locInput'  + i).value.trim());
 
-  if (anyText) db.notes[editKey] = txts; else delete db.notes[editKey];
-  if (anyTime) db.times[editKey] = tims; else delete db.times[editKey];
+  if (txts.some(t => t)) db.notes[editKey] = txts; else delete db.notes[editKey];
+  if (tims.some(t => t)) db.times[editKey] = tims; else delete db.times[editKey];
+  if (locs.some(l => l)) db.locs[editKey]  = locs; else delete db.locs[editKey];
+  if (pendingDayImgs.some(img => img)) db.dayImages[editKey] = [...pendingDayImgs];
+  else delete db.dayImages[editKey];
   if (modalAct.size > 0) db.placements[editKey] = [...modalAct]; else delete db.placements[editKey];
-  if (pendingDayImg) db.dayImages[editKey] = pendingDayImg; else delete db.dayImages[editKey];
 
   saveDB();
   if (selKey === editKey) renderDetail();
@@ -1298,22 +1439,30 @@ document.getElementById('saveBtn').addEventListener('click', () => {
 document.getElementById('clearBtn').addEventListener('click', () => {
   if (!editKey) return;
   delete db.notes[editKey]; delete db.times[editKey];
-  delete db.placements[editKey]; delete db.dayImages[editKey];
-  pendingDayImg = null;
+  delete db.locs[editKey]; delete db.placements[editKey]; delete db.dayImages[editKey];
+  pendingDayImgs = [null, null, null];
+  for (let i = 0; i < 3; i++) updateImgSmUI(i);
+  for (let i = 0; i < 3; i++) {
+    document.getElementById('noteArea'  + i).value = '';
+    document.getElementById('timeInput' + i).value = '';
+    document.getElementById('locInput'  + i).value = '';
+  }
+  modalAct.clear();
+  renderModalStamps();
   saveDB(); renderCalendar(); renderDetail();
   closeDayOverlay();
 });
+
 document.getElementById('closeModal').addEventListener('click', () => closeDayOverlay());
 document.getElementById('dayOverlay').addEventListener('click', e => {
   if (e.target.id === 'dayOverlay') closeDayOverlay();
 });
 
-// Day image upload
 document.getElementById('dayImgIn').addEventListener('change', async e => {
   const file = e.target.files[0];
   if (!file) return;
-  pendingDayImg = await compress(file, 600, 0.68);
-  updateImgAttachUI();
+  pendingDayImgs[imgUploadIdx] = await compress(file, 600, 0.68);
+  updateImgSmUI(imgUploadIdx);
   e.target.value = '';
 });
 
@@ -1339,7 +1488,8 @@ function renderManager() {
   const body = document.getElementById('mgrBody');
   body.innerHTML = '';
   CATS.forEach(cat => {
-    const stamps = STAMPS.filter(s => s.cat === cat.key);
+    const stamps = getOrderedStamps().filter(s => s.cat === cat.key);
+    if (stamps.length === 0) return;
     const sec = document.createElement('div'); sec.className = 'cat-section';
     const t = document.createElement('div'); t.className = 'cat-title'; t.textContent = cat.label;
     sec.appendChild(t);
@@ -1353,7 +1503,7 @@ function renderManager() {
       } else { th.textContent = def.emoji; }
       const nm = document.createElement('div'); nm.className = 'slot-name'; nm.textContent = def.name;
       const ac = document.createElement('div'); ac.className = 'slot-action';
-      ac.textContent = db.images[def.id] ? '✓ 変更する' : '+ アップロード';
+      ac.textContent = db.images[def.id] ? '\u2713 \u5909\u66F4\u3059\u308B' : '+ \u30A2\u30C3\u30D7\u30ED\u30FC\u30C9';
       slot.appendChild(th); slot.appendChild(nm); slot.appendChild(ac);
       slot.addEventListener('click', () => { uploadTarget = def.id; document.getElementById('fileIn').click(); });
       sg.appendChild(slot);
@@ -1379,6 +1529,63 @@ document.getElementById('fileIn').addEventListener('change', async e => {
 });
 
 // ═══════════════════════════════════════════════════════
+// SORT PANEL
+// ═══════════════════════════════════════════════════════
+function renderSortPanel() {
+  const list = document.getElementById('sortList');
+  list.innerHTML = '';
+  const ordered = getOrderedStamps();
+  ordered.forEach((def, idx) => {
+    const item = document.createElement('div'); item.className = 'sort-item';
+
+    const th = document.createElement('div'); th.className = 'sort-thumb';
+    if (db.images[def.id]) {
+      const img = document.createElement('img'); img.src = db.images[def.id]; th.appendChild(img);
+    } else { th.textContent = def.emoji; }
+
+    const info = document.createElement('div'); info.className = 'sort-info';
+    const nm = document.createElement('div'); nm.className = 'sort-name'; nm.textContent = def.name;
+    const cat = CATS.find(c => c.key === def.cat);
+    const catLbl = document.createElement('div'); catLbl.className = 'sort-cat-lbl'; catLbl.textContent = cat?.label || '';
+    info.appendChild(nm); info.appendChild(catLbl);
+
+    const arrows = document.createElement('div'); arrows.className = 'sort-arrows';
+    const upBtn = document.createElement('button'); upBtn.className = 'sort-arrow-btn'; upBtn.textContent = '\u2191';
+    if (idx === 0) upBtn.disabled = true;
+    upBtn.addEventListener('click', () => {
+      const arr = getOrderedStamps().map(s => s.id);
+      [arr[idx - 1], arr[idx]] = [arr[idx], arr[idx - 1]];
+      db.stampOrder = arr; saveDB(); renderSortPanel();
+    });
+    const dnBtn = document.createElement('button'); dnBtn.className = 'sort-arrow-btn'; dnBtn.textContent = '\u2193';
+    if (idx === ordered.length - 1) dnBtn.disabled = true;
+    dnBtn.addEventListener('click', () => {
+      const arr = getOrderedStamps().map(s => s.id);
+      [arr[idx], arr[idx + 1]] = [arr[idx + 1], arr[idx]];
+      db.stampOrder = arr; saveDB(); renderSortPanel();
+    });
+    arrows.appendChild(upBtn); arrows.appendChild(dnBtn);
+
+    item.appendChild(th); item.appendChild(info); item.appendChild(arrows);
+    list.appendChild(item);
+  });
+}
+
+document.getElementById('sortBtn').addEventListener('click', () => {
+  renderSortPanel();
+  document.getElementById('sortPanel').classList.remove('hide');
+});
+document.getElementById('sortBackBtn').addEventListener('click', () => {
+  document.getElementById('sortPanel').classList.add('hide');
+});
+document.getElementById('sortDoneBtn').addEventListener('click', () => {
+  document.getElementById('sortPanel').classList.add('hide');
+  renderManager();
+  renderPalette();
+  renderCalendar();
+});
+
+// ═══════════════════════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════════════════════
 document.getElementById('prevBtn').addEventListener('click', () => {
@@ -1391,8 +1598,7 @@ document.getElementById('nextBtn').addEventListener('click', () => {
 });
 document.getElementById('todayBtn').addEventListener('click', () => {
   const n = new Date(); curY = n.getFullYear(); curM = n.getMonth();
-  const todayKey = dk(n.getFullYear(), n.getMonth(), n.getDate());
-  selKey = todayKey;
+  selKey = dk(n.getFullYear(), n.getMonth(), n.getDate());
   renderCalendar(); renderDetail();
 });
 
@@ -1403,7 +1609,6 @@ loadDB();
 buildThemePicker();
 applyTheme(curThemeKey);
 
-// Auto-select today
 const nowDate = new Date();
 selKey = dk(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate());
 curY = nowDate.getFullYear(); curM = nowDate.getMonth();
